@@ -8,6 +8,7 @@ object Dependencies {
   val cassandraVersion = "2.1.10.3"
   val confServiceVersion="1.2.1"
   val loggerVersion="1.7.25"
+
   def compileDependencies(deps: List[ModuleID]): Seq[ModuleID] = deps map (_ % Compile)
 
   def providedDependencies(deps: List[ModuleID]): Seq[ModuleID] = deps map (_ % Provided)
@@ -22,11 +23,11 @@ object Dependencies {
   }
 
   def akkaHttpTest: Def.Initialize[List[ModuleID]] = Def.setting {
-    "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test :: Nil
+    "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion :: Nil
   }
 
   def scalaTest: Def.Initialize[List[ModuleID]] = Def.setting {
-    "org.scalatest" %% "scalatest" % scalaTestVersion % Test :: Nil
+    "org.scalatest" %% "scalatest" % scalaTestVersion :: "org.mockito" % "mockito-core" % "1.10.19" :: Nil
   }
 
   def akkaJson: Def.Initialize[List[ModuleID]] = Def.setting {
@@ -34,7 +35,7 @@ object Dependencies {
   }
 
   def javaMailer: Def.Initialize[List[ModuleID]] = Def.setting {
-    "javax.mail" % "mail" % javaMailVersion :: Nil
+    "javax.mail" % "mail" % javaMailVersion :: "org.jvnet.mock-javamail" % "mock-javamail" % "1.9" :: Nil
   }
 
  def typesafeConfService: Def.Initialize[List[ModuleID]] =Def.setting{
@@ -43,6 +44,9 @@ object Dependencies {
   def loggers=Def.setting{
     "org.slf4j" % "slf4j-api" % loggerVersion :: "org.slf4j" % "slf4j-simple" % "1.7.25" :: Nil
   }
-
-
+def encryptionDependency: Def.Initialize[List[ModuleID]] = Def.setting { "org.mindrot" % "jbcrypt" % "0.3m" :: Nil
+}
+def sprayJson:Def.Initialize[List[ModuleID]] = Def.setting{
+  "io.spray" %% "spray-json" % "1.3.4" :: "com.typesafe.akka" %% "akka-http-spray-json-experimental" % "2.4.11.2" :: "org.json4s" %% "json4s-native" % "3.6.0-M3" :: "org.json4s" %% "json4s-ast" % "3.6.0-M3" ::  Nil
+}
 }
