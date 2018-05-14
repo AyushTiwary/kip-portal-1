@@ -1,8 +1,5 @@
 package com.knoldus.services
 
-import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
-
 import akka.actor.{ActorSystem, Props}
 import akka.pattern.ask
 import com.knoldus.actor.DirectNotificationActor
@@ -10,8 +7,10 @@ import com.knoldus.domains.{User, UserResponse}
 import com.knoldus.service.MailServiceImpl
 import com.knoldus.util.{LoggerHelper, PassWordUtility, RandomUtil}
 
-trait UserService extends LoggerHelper {
+import scala.util.{Failure, Success, Try}
 
+
+trait UserService extends LoggerHelper {
   val logger = getLogger(this.getClass)
 
   def createUser(userRequest: User): User = {
@@ -19,24 +18,23 @@ trait UserService extends LoggerHelper {
     //TODO store the info in cassandra db
     val system = ActorSystem("directNotificationActor")
 
-
-    val directNotifcationActor = system
+    val directNotificationActor = system
       .actorOf(Props(new DirectNotificationActor(new MailServiceImpl)))
-    logger.info(s"Sending Email to ${ userRequest.emailId }}")
-    import scala.concurrent.duration._
-
+    logger.info(s"Sending Email to ${userRequest.emailId}}")
     import akka.util.Timeout
 
-    implicit val timeout = Timeout(15 seconds)
-    val user = UserResponse(userRequest.emailId, password)
+    import scala.concurrent.duration._
 
-    val isEmailDispatched = Try(
-      directNotifcationActor ? user)
-
-    isEmailDispatched match {
+    implicit val timeout = Timeout(5 seconds)
+    val mailDispatch = Try {
+      directNotificationActor ?
+        UserResponse(userRequest.emailId, password, userRequest.userType)
+    }
+    mailDispatch match {
       case Success(_) =>
-        User(user.emailId)
-      case Failure(exception) => logger.error(s"Sending email failed ${ exception.getMessage }")
+        logger.info("Email is sent successfully !")
+        userRequest
+      case Failure(exception) => logger.error(s"Sending email failed ${exception.getMessage}")
         throw new Exception(exception.getMessage)
     }
   }
