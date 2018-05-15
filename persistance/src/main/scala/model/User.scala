@@ -38,6 +38,13 @@ abstract class User extends CassandraTable[User, UserInfo] with RootConnector {
     case _ => Future.failed(new Exception("unable to update the category"))
   }
 
+  def updatePasswordByEmail(email: String, password: String): Future[ResultSet] = {
+      update.where(_.email eqs email)
+        .modify(_.passWord setTo password).future()
+    }.recoverWith{
+    case _ => Future.failed(new Exception("unable to update the password"))
+  }
+
   object email extends StringColumn(this) with PartitionKey
 
   object category extends Col[Category.Value](this) with Index

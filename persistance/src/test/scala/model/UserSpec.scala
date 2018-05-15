@@ -12,7 +12,7 @@ class UserSpec extends TestSuite {
     futureUserInfo.map(userInfo => assert(userInfo === dummyUserInfo))
   }
 
-  it should "update category by email in User" in {
+  it should "update category by email in User table" in {
     val email = "emailId@knoldus.com"
     val futureUserInfo = for {
       _ <- database.user.createUser(UserInfo(email, "password", Category.Trainee))
@@ -20,6 +20,16 @@ class UserSpec extends TestSuite {
       userInfo <- database.user.getUserByEmail(email)
     } yield userInfo
     futureUserInfo.map(userInfo => assert(userInfo === UserInfo(email, "password", Category.Admin)))
+  }
+
+  it should "update password by email in User table" in {
+    val email = "emailId@knoldus.com"
+    val futureUserInfo = for {
+      _ <- database.user.createUser(UserInfo(email, "oldPassword", Category.Trainee))
+      _ <- database.user.updatePasswordByEmail(email, "newPassword")
+      userInfo <- database.user.getUserByEmail(email)
+    } yield userInfo
+    futureUserInfo.map(userInfo => assert(userInfo === UserInfo(email, "newPassword", Category.Trainee)))
   }
 
 }
