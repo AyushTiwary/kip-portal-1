@@ -1,10 +1,12 @@
 package model
 
+import com.knoldus.domains.UserResponse
+
 class UserSpec extends TestSuite {
 
   it should "create & get user table in cassandra" in {
     val email = "emailId@knoldus.com"
-    val dummyUserInfo = UserInfo(email, "password", Category.Trainee)
+    val dummyUserInfo = UserResponse(email, "password")
     val futureUserInfo = for {
       _ <- database.user.createUser(dummyUserInfo)
       userInfo <- database.user.getUserByEmail(email)
@@ -15,21 +17,21 @@ class UserSpec extends TestSuite {
   it should "update category by email in User table" in {
     val email = "emailId@knoldus.com"
     val futureUserInfo = for {
-      _ <- database.user.createUser(UserInfo(email, "password", Category.Trainee))
-      _ <- database.user.updateCategoryByEmail(email, Category.Admin)
+      _ <- database.user.createUser(UserResponse(email, "password"))
+      _ <- database.user.updateCategoryByEmail(email, "Admin")
       userInfo <- database.user.getUserByEmail(email)
     } yield userInfo
-    futureUserInfo.map(userInfo => assert(userInfo === UserInfo(email, "password", Category.Admin)))
+    futureUserInfo.map(userInfo => assert(userInfo === UserResponse(email, "password", Option("Admin"))))
   }
 
   it should "update password by email in User table" in {
     val email = "emailId@knoldus.com"
     val futureUserInfo = for {
-      _ <- database.user.createUser(UserInfo(email, "oldPassword", Category.Trainee))
+      _ <- database.user.createUser(UserResponse(email, "oldPassword"))
       _ <- database.user.updatePasswordByEmail(email, "newPassword")
       userInfo <- database.user.getUserByEmail(email)
     } yield userInfo
-    futureUserInfo.map(userInfo => assert(userInfo === UserInfo(email, "newPassword", Category.Trainee)))
+    futureUserInfo.map(userInfo => assert(userInfo === UserResponse(email, "newPassword", Option("Trainee"))))
   }
 
 }
