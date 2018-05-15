@@ -2,6 +2,7 @@ package model
 
 import com.datastax.driver.core.ResultSet
 import com.outworkers.phantom.CassandraTable
+import com.outworkers.phantom.connectors.CassandraConnection
 import com.outworkers.phantom.dsl._
 
 import scala.concurrent.Future
@@ -43,4 +44,8 @@ abstract class User extends CassandraTable[User, UserInfo] with RootConnector {
 
   object passWord extends StringColumn(this)
 
+}
+class AppDatabase(val keyspace: CassandraConnection) extends Database[AppDatabase](keyspace) {
+
+  object user extends User with Connector
 }

@@ -15,8 +15,7 @@ object Dependencies {
 
   def testDependencies(deps: List[ModuleID]): Seq[ModuleID] = deps map (_ % Test)
 
-
-  def testClassifierDependencies(deps: List[ModuleID]) = deps map (_ % "test" classifier "tests")
+  def testClassifierDependencies(deps: List[ModuleID]): List[ModuleID] = deps map (_ % "test" classifier "tests")
 
   def akkaHttp: Def.Initialize[List[ModuleID]] = Def.setting {
     "com.typesafe.akka" %% "akka-http" % akkaHttpVersion :: Nil
@@ -28,6 +27,10 @@ object Dependencies {
 
   def scalaTest: Def.Initialize[List[ModuleID]] = Def.setting {
     "org.scalatest" %% "scalatest" % scalaTestVersion :: "org.mockito" % "mockito-core" % "1.10.19" :: Nil
+  }
+
+  def embeddedCassandra: Def.Initialize[List[ModuleID]] = Def.setting {
+    "org.cassandraunit" % "cassandra-unit" % "3.1.3.2" :: Nil
   }
 
   def akkaJson: Def.Initialize[List[ModuleID]] = Def.setting {

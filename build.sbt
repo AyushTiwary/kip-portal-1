@@ -19,9 +19,8 @@ lazy val common = BaseProject("common").settings(
     ++ testClassifierDependencies(Nil))
 
 lazy val persistence = BaseProject("persistence").settings(
-  libraryDependencies ++= compileDependencies(akkaHttp.value)
-
-    ++ testClassifierDependencies(Nil)).dependsOn(common)
+  libraryDependencies ++= compileDependencies(cassandraPhantom.value)
+    ++ testClassifierDependencies(Nil) ++ testDependencies(scalaTest.value ++ embeddedCassandra.value)).dependsOn(common)
   .settings(sbtAssemblySettings: _*)
 
 lazy val userApi = BaseProject("user-api").settings(
