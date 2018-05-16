@@ -24,7 +24,7 @@ lazy val persistence = BaseProject("persistence").settings(
   .settings(sbtAssemblySettings: _*)
 
 lazy val userApi = BaseProject("user-api").settings(
-  libraryDependencies ++= compileDependencies(akkaHttp.value ++ akkaJson.value ++ encryptionDependency.value ++ sprayJson.value ++ cassandraPhantom.value)
+  libraryDependencies ++= compileDependencies(akkaHttp.value ++ akkaJson.value ++ encryptionDependency.value ++ sprayJson.value ++ cassandraPhantom.value ++ cors.value)
     ++ testClassifierDependencies(Nil) ++ testDependencies(akkaHttpTest.value ++ scalaTest.value)).dependsOn(notificationApi,common,persistence)
 
 lazy val notificationApi = BaseProject("notification-api").settings(

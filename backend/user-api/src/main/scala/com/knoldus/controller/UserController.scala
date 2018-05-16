@@ -14,6 +14,7 @@ import com.knoldus.exceptions.UserAlreadyExistsException
 import com.knoldus.responses.ErrorResponses._
 import com.knoldus.services.UserService
 import com.knoldus.util.{JsonHelper, LoggerHelper}
+import ch.megard.akka.http.cors.scaladsl.CorsDirectives._
 
 
 trait UserController extends JsonHelper with LoggerHelper {
@@ -24,23 +25,24 @@ trait UserController extends JsonHelper with LoggerHelper {
   def userRoutes: Route = userPOST ~ userLoginPOST
 
   def userPOST: Route = {
-    path("kip" / "createusers") {
+    cors() {
+      path("kip" / "createuser") {
 
-      import com.knoldus.domains.UserInfo
-      post {
-        entity(as[UserInfo]) { data =>
-          logger.info(s"Get the new user with data $data")
-          if (data.emailId.isEmpty) {
-            complete(invalidJson(data))
-          }
-          else {
-            complete(handleUserCreationRequest(data))
+        import com.knoldus.domains.UserInfo
+        post {
+          entity(as[UserInfo]) { data =>
+            logger.info(s"Get the new user with data $data")
+            if (data.emailId.isEmpty) {
+              complete(invalidJson(data))
+            }
+            else {
+              complete(handleUserCreationRequest(data))
+            }
           }
         }
       }
     }
   }
-
   private def handleUserCreationRequest(userReq: UserInfo): Future[HttpResponse] = {
     val newUser = userService.createUser(userReq)
 
@@ -50,9 +52,9 @@ trait UserController extends JsonHelper with LoggerHelper {
           entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_PARSE(res)))
     }.recoverWith {
       case userAlreadyException: UserAlreadyExistsException =>
-        logger.error(userAlreadyException.printStackTrace.toString, userAlreadyException)
+        logger.error(userAlreadyException.printStackTrace().toString, userAlreadyException)
         Future
-          .successful(HttpResponse(OK,
+          .successful(HttpResponse(BadRequest,
             entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, USER_ALREADY_EXISTS)))
 
       case exception: Exception =>
@@ -71,22 +73,23 @@ trait UserController extends JsonHelper with LoggerHelper {
   }
 
   def userLoginPOST: Route = {
-    path("kip" / "login") {
-      import com.knoldus.domains.UserDetails
-      post {
-        entity(as[UserDetails]) { data =>
-          complete(handleLoginRequest(data))
+    cors() {
+      path("kip" / "login") {
+        import com.knoldus.domains.UserDetails
+        post {
+          entity(as[UserDetails]) { data =>
+            complete(handleLoginRequest(data))
+          }
         }
       }
     }
   }
-
   private def handleLoginRequest(userLogin: UserDetails): Future[HttpResponse] = {
     userService.validateUser(userLogin).flatMap {
       user =>
         user.fold {
           Future
-            .successful(HttpResponse(OK,
+            .successful(HttpResponse(NotFound,
               entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INVALID_CREDENTIALS)))
         } {
           result => Future
