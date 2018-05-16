@@ -67,4 +67,7 @@ object Dependencies {
   def javaMailerMock =Def.setting{
     "org.jvnet.mock-javamail" % "mock-javamail" % "1.9" :: Nil
   }
+  def cors: Def.Initialize[List[ModuleID]] = Def.setting{
+    "ch.megard" %% "akka-http-cors" % "0.2.2" :: Nil
+  }
 }
