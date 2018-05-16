@@ -5,4 +5,5 @@ target
 .classpath
 .settings
 .idea
-!.gitignore
+.gitignore
+../.idea/

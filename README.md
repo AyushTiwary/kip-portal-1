@@ -1,4 +1,4 @@
-KIP - Platform for kip automation
+KIP-PORTAL - Platform for kip automation
 
 
 ### How to run User-Api module :
@@ -34,12 +34,12 @@ Below steps are required to run user-api module
    {
      "emailId": "anubhav.tarar@knoldus.in" 
    }
-   
+      
    Json for user login
    
    {
-     "emailId": "anubhav.tarar@knoldus.in",
-     "password": "iql2ihrdouauv4ps9q9t57i2"
-   
+  "emailId": "anubhav.tarar@knoldus.in",
+  "password": "iql2ihrdouauv4ps9q9t57i2"
+
    }
    ```
