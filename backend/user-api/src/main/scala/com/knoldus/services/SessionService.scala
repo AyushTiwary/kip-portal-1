@@ -1,24 +1,23 @@
 package com.knoldus.services
 
+import java.util.Date
+
 import com.knoldus.domains.{DisplaySchedule, ScheduleInfo, SessionDetails}
-import com.knoldus.util.LoggerHelper
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SessionService extends LoggerHelper {
+class SessionService {
   val config = ConfigFactory.load()
   val appDatabase = new PortalDataBase(config).getClusterDB
   val sessionHelper = new SessionServiceHelper
-  val loggerHelper = getLogger(this.getClass)
 
   def createSession(sessionDetails: SessionDetails): Future[DisplaySchedule] = {
-    val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateToDateString(sessionDetails.startDate)
+    val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateStringToDate(sessionDetails.startDate)
     val numberOfDays = sessionDetails.numberOfDays
-    loggerHelper.info("->" + sessionDetails)
-    val startDate = sessionHelper.parseDateToDateString(sessionDetails.startDate)
+    val startDate = sessionHelper.parseDateToDateString(sessionHelper.parseDateStringToDate(sessionDetails.startDate))
     val endDate = sessionHelper.addDaysToDate(startDate, numberOfDays)
     for {
       canCreate <- sessionHelper.checkDatesToCreateSession(startDate, numberOfDays)
