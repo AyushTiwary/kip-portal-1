@@ -45,7 +45,11 @@ class SessionService {
     }
   }
 
-  def updateSession(previousDate: String, updateDate: String): Future[List[DisplaySchedule]] = ???/*{
+  //Todo(ayush) add logic for updating the session
+  def updateSession(previousDate: String, updateDate: String): Future[DisplaySchedule] = {
+    Future.successful(DisplaySchedule(previousDate, updateDate, "trainee", "technologyName", 4, "content", None))
+  }
+  /*{
     for {
       sessionInfoLIst <- appDatabase.knolSession.getAll
       _ <- Future.sequence(sessionInfoLIst.map { sessionInfo =>
