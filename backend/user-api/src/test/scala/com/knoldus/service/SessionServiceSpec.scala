@@ -13,7 +13,7 @@ class SessionServiceSpec extends TestSuite {
 
   it should "create the session" in {
     val date = formatter.parse("2018/12/4")
-    val scheduleDetails = SessionDetails(date, "trainee", "technologyName", 1, "content", None)
+    val scheduleDetails = SessionDetails("2018/12/4", "trainee", "technologyName", 1, "content", None)
     val res = sessionService.createSession(scheduleDetails)
     Thread.sleep(1000000)
     res.map(r => assert(r === scheduleDetails))

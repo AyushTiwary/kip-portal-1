@@ -15,9 +15,9 @@ class SessionService {
   val sessionHelper = new SessionServiceHelper
 
   def createSession(sessionDetails: SessionDetails): Future[DisplaySchedule] = {
-    val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateToDateString(sessionDetails.startDate)
+    val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateStringToDate(sessionDetails.startDate)
     val numberOfDays = sessionDetails.numberOfDays
-    val startDate = sessionHelper.parseDateToDateString(sessionDetails.startDate)
+    val startDate = sessionHelper.parseDateToDateString(sessionHelper.parseDateStringToDate(sessionDetails.startDate))
     val endDate = sessionHelper.addDaysToDate(startDate, numberOfDays)
     for {
       canCreate <- sessionHelper.checkDatesToCreateSession(startDate, numberOfDays)
@@ -27,7 +27,7 @@ class SessionService {
           scheduleInfo = ScheduleInfo(sessionId, startDate, sessionDetails.trainee, sessionDetails.technologyName,
             sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
           _ <- appDatabase.schedule.createSchedule(scheduleInfo)
-          displaySchedule = DisplaySchedule(sessionHelper.parseDateStringToDate(startDate), sessionHelper.parseDateStringToDate(endDate), sessionDetails.trainee, sessionDetails.technologyName,
+          displaySchedule = DisplaySchedule(startDate, endDate, sessionDetails.trainee, sessionDetails.technologyName,
             sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
         } yield displaySchedule
       } else {
@@ -41,14 +41,14 @@ class SessionService {
       sessionDetailsList.map { sessionDetails =>
         val startDate = sessionDetails.startDate
         val endDate = sessionHelper.addDaysToDate(startDate, sessionDetails.numberOfDays)
-        DisplaySchedule(sessionHelper.parseDateStringToDate(startDate), sessionHelper.parseDateStringToDate(endDate), sessionDetails.trainee, sessionDetails.technologyName,
+        DisplaySchedule(startDate, endDate, sessionDetails.trainee, sessionDetails.technologyName,
           sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
       }
     }
   }
 
   //Todo(ayush) add logic for updating the session
-  def updateSession(previousDate: Date, updateDate: Date): Future[DisplaySchedule] = {
+  def updateSession(previousDate: String, updateDate: String): Future[DisplaySchedule] = {
     Future.successful(DisplaySchedule(previousDate, updateDate, "trainee", "technologyName", 4, "content", None))
   }
   /*{
