@@ -25,7 +25,7 @@ lazy val persistence = BaseProject("persistence").settings(
 
 lazy val userApi = BaseProject("user-api").settings(
   libraryDependencies ++= compileDependencies(akkaHttp.value ++ akkaJson.value ++ encryptionDependency.value ++ sprayJson.value ++ cassandraPhantom.value ++ cors.value)
-    ++ testClassifierDependencies(Nil) ++ testDependencies(akkaHttpTest.value ++ scalaTest.value ++  embeddedCassandra.value).dependsOn(notificationApi,common,persistence)
+    ++ testClassifierDependencies(Nil) ++ testDependencies(akkaHttpTest.value ++ scalaTest.value ++  embeddedCassandra.value)).dependsOn(notificationApi,common,persistence)
 
 lazy val notificationApi = BaseProject("notification-api").settings(
   libraryDependencies ++= compileDependencies(akkaHttp.value ++ akkaJson.value ++ javaMailer.value ++ loggers.value)

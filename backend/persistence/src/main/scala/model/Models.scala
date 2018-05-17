@@ -51,7 +51,7 @@ abstract class Schedule extends CassandraTable[Schedule, ScheduleInfo] with Root
 
   def createSchedule(scheduleInfo: ScheduleInfo): Future[ResultSet] = {
     insert.value(_.sessionId, scheduleInfo.sessionId)
-      .value(_.date, scheduleInfo.date)
+      .value(_.date, scheduleInfo.startDate)
       .value(_.trainee, scheduleInfo.trainee)
       .value(_.technologyName, scheduleInfo.technologyName)
       .value(_.numberOfDays, scheduleInfo.numberOfDays)
@@ -62,7 +62,7 @@ abstract class Schedule extends CassandraTable[Schedule, ScheduleInfo] with Root
     case _ => Future.failed(new Exception("unable to create the schedule"))
   }
 
-  def getAll(): Future[List[ScheduleInfo]] =
+  def getAll: Future[List[ScheduleInfo]] =
     select.fetch()
 
   def updateScheduleDate(sessionId: String, date: String): Future[ResultSet] = {
@@ -94,7 +94,7 @@ abstract class Schedule extends CassandraTable[Schedule, ScheduleInfo] with Root
 
 }
 
-abstract class Session extends CassandraTable[Session, SessionInfo] with RootConnector {
+abstract class KnolSession extends CassandraTable[KnolSession, SessionInfo] with RootConnector {
 
   def createSession(sessionId: String, date: String): Future[ResultSet] =
     insert.value(_.sessionId, sessionId)
@@ -104,7 +104,7 @@ abstract class Session extends CassandraTable[Session, SessionInfo] with RootCon
   def deleteSession(date: String): Future[ResultSet] =
     delete.where(_.date eqs date).future()
 
-  def getAll(): Future[List[SessionInfo]] =
+  def getAll: Future[List[SessionInfo]] =
     select.fetch()
 
   def getSessionByDate(date: String): Future[Option[SessionInfo]] =
@@ -122,8 +122,8 @@ abstract class Holiday extends CassandraTable[Holiday, HolidayDetail] with RootC
 
   def createHoliday(date: String, holiday: String): Future[ResultSet] =
     insert.value(_.date, date)
-    .value(_.holiday, holiday)
-    .future()
+      .value(_.holiday, holiday)
+      .future()
 
   def getHoliday(date: String): Future[Option[HolidayDetail]] =
     select.where(_.date eqs date).one
@@ -139,13 +139,33 @@ abstract class Holiday extends CassandraTable[Holiday, HolidayDetail] with RootC
 
 }
 
+abstract class SessionDate extends CassandraTable[SessionDate, String] with RootConnector {
+
+  def book(date: String): Future[ResultSet] =
+    insert.value(_.date, date).future()
+
+  def getAll: Future[List[String]] =
+    select.fetch()
+  /*
+    def delete(date: String): Future[ResultSet] =
+      delete.where(_.date eqs date).future()*/
+
+  def getOne(date: String): Future[Option[String]] =
+    select.where(_.date eqs date).one
+
+  object date extends StringColumn(this) with PartitionKey
+
+}
+
 class AppDatabase(val keyspace: CassandraConnection) extends Database[AppDatabase](keyspace) {
 
   object user extends User with Connector
 
   object schedule extends Schedule with Connector
 
-  object session extends Session with Connector
+  object knolSession extends KnolSession with Connector
 
   object holiday extends Holiday with Connector
+
+  object sessionDate extends SessionDate with Connector
 }
