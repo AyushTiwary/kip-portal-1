@@ -27,6 +27,9 @@ final case class DisplaySchedule(startDate: String,
                                  content: String,
                                  assistantTrainer: Option[String])
 
+final case class UpdateSessionDetails(previousDate: String,
+                                      updateDate: String)
+
 final case class ScheduleInfo(sessionId: String,
                               startDate: String,
                               trainee: String,
@@ -65,6 +68,10 @@ case object UserInfo extends DefaultJsonProtocol with SprayJsonSupport {
 
 case object UserDetails extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val userLoginRequestProtocol = jsonFormat3(UserDetails.apply)
+}
+
+case object UpdateSessionDetails extends DefaultJsonProtocol with SprayJsonSupport {
+  implicit val updateSessionDetailsRequestProtocol = jsonFormat2(UpdateSessionDetails.apply)
 }
 
 case object SessionDetails extends DefaultJsonProtocol with SprayJsonSupport {

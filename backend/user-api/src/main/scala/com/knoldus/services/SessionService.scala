@@ -2,7 +2,7 @@ package com.knoldus.services
 
 import java.util.Date
 
-import com.knoldus.domains.{DisplaySchedule, ScheduleInfo, SessionDetails}
+import com.knoldus.domains.{DisplaySchedule, ScheduleInfo, SessionDetails, UpdateSessionDetails}
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
 
@@ -48,8 +48,8 @@ class SessionService {
   }
 
   //Todo(ayush) add logic for updating the session
-  def updateSession(previousDate: String, updateDate: String): Future[DisplaySchedule] = {
-    Future.successful(DisplaySchedule(previousDate, updateDate, "trainee", "technologyName", 4, "content", None))
+  def updateSession(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
+    Future.successful(DisplaySchedule(updateSessionDetails.previousDate, updateSessionDetails.updateDate, "trainee", "technologyName", 4, "content", None))
   }
   /*{
     for {
