@@ -1,5 +1,7 @@
 package com.knoldus.services
 
+import java.util.Date
+
 import com.knoldus.domains.{DisplaySchedule, ScheduleInfo, SessionDetails}
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
@@ -25,7 +27,7 @@ class SessionService {
           scheduleInfo = ScheduleInfo(sessionId, startDate, sessionDetails.trainee, sessionDetails.technologyName,
             sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
           _ <- appDatabase.schedule.createSchedule(scheduleInfo)
-          displaySchedule = DisplaySchedule(startDate, endDate, sessionDetails.trainee, sessionDetails.technologyName,
+          displaySchedule = DisplaySchedule(sessionHelper.parseDateStringToDate(startDate), sessionHelper.parseDateStringToDate(endDate), sessionDetails.trainee, sessionDetails.technologyName,
             sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
         } yield displaySchedule
       } else {
@@ -39,14 +41,14 @@ class SessionService {
       sessionDetailsList.map { sessionDetails =>
         val startDate = sessionDetails.startDate
         val endDate = sessionHelper.addDaysToDate(startDate, sessionDetails.numberOfDays)
-        DisplaySchedule(startDate, endDate, sessionDetails.trainee, sessionDetails.technologyName,
+        DisplaySchedule(sessionHelper.parseDateStringToDate(startDate), sessionHelper.parseDateStringToDate(endDate), sessionDetails.trainee, sessionDetails.technologyName,
           sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
       }
     }
   }
 
   //Todo(ayush) add logic for updating the session
-  def updateSession(previousDate: String, updateDate: String): Future[DisplaySchedule] = {
+  def updateSession(previousDate: Date, updateDate: Date): Future[DisplaySchedule] = {
     Future.successful(DisplaySchedule(previousDate, updateDate, "trainee", "technologyName", 4, "content", None))
   }
   /*{
