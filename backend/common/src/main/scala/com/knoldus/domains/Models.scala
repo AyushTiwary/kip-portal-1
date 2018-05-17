@@ -9,15 +9,15 @@ final case class UserInfo(emailId: String, userType: Option[String] = None)
 
 final case class UserDetails(emailId: String, password: String, userType: Option[String] = None)
 
-final case class SessionDetails(startDate: Date,
+final case class SessionDetails(startDate: String,
                                 trainee: String,
                                 technologyName: String,
                                 numberOfDays: Int,
                                 content: String,
                                 assistantTrainer: Option[String])
 
-final case class DisplaySchedule(startDate: Date,
-                                 endDate: Date,
+final case class DisplaySchedule(startDate: String,
+                                 endDate: String,
                                  trainee: String,
                                  technologyName: String,
                                  numberOfDays: Int,
