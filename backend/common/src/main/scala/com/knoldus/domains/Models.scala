@@ -16,8 +16,8 @@ final case class SessionDetails(startDate: Date,
                                 content: String,
                                 assistantTrainer: Option[String])
 
-final case class DisplaySchedule(startDate: String,
-                                 endDate: String,
+final case class DisplaySchedule(startDate: Date,
+                                 endDate: Date,
                                  trainee: String,
                                  technologyName: String,
                                  numberOfDays: Int,
