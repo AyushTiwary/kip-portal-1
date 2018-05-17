@@ -38,7 +38,7 @@ final case class ScheduleInfo(sessionId: String,
                               content: String,
                               assistantTrainer: Option[String])
 
-case class SessionInfo(sessionId: String, startDate: String)
+case class SessionInfo(sessionId: String, startDate: String, numberOfDays: Int)
 
 object DateMarshalling {
   implicit object DateFormat extends JsonFormat[Date] {

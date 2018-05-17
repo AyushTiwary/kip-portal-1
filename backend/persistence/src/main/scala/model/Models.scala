@@ -96,9 +96,10 @@ abstract class Schedule extends CassandraTable[Schedule, ScheduleInfo] with Root
 
 abstract class KnolSession extends CassandraTable[KnolSession, SessionInfo] with RootConnector {
 
-  def createSession(sessionId: String, date: String): Future[ResultSet] =
+  def createSession(sessionId: String, date: String, numberOfDays: Int): Future[ResultSet] =
     insert.value(_.sessionId, sessionId)
       .value(_.date, date)
+    .value(_.numberOfDays, numberOfDays)
       .future()
 
   def deleteSession(date: String): Future[ResultSet] =
@@ -113,6 +114,8 @@ abstract class KnolSession extends CassandraTable[KnolSession, SessionInfo] with
   object date extends StringColumn(this) with PartitionKey
 
   object sessionId extends StringColumn(this)
+
+  object numberOfDays extends IntColumn(this)
 
 }
 

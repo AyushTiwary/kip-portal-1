@@ -3,10 +3,10 @@ package com.knoldus.services
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
-import com.outworkers.phantom.dsl.ResultSet
 import com.typesafe.config.ConfigFactory
 import model.{HolidayDetail, PortalDataBase}
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -79,6 +79,32 @@ class SessionServiceHelper {
     formatter.parse(dateString)
   }
 
+  def getNumberOfDays(startDate: String, endDate: String): Int ={
+    (parseDateStringToDate(endDate).getTime - parseDateStringToDate(startDate).getTime) / (1000 * 60 * 60 * 24)
+  }.toInt
+
+/*  def getEndDate(startDate: String, dayCount: Int) ={
+
+  }*/
+
+/*  def findListOfWorkingDays(startDate: String, numberOfDays: Int)={
+    var days = 1
+    var datesStr = ListBuffer(startDate)
+    while(days != numberOfDays){
+      nextAvailableDate(datesStr.last).map{ date =>
+        datesStr.+=:(date)
+      }
+      days = days + 1
+    }
+    datesStr.toList
+  }*/
+
+/*  def addDaysToDate1(str: String, i: Int) ={
+    (0 until(i)).toList.map{ _ =>
+      nextAvailableDate(str)
+    }
+  }*/
+
   def addDaysToDate(dateString: String, numberOfDays: Int): String = {
     val calendar = Calendar.getInstance()
     calendar.setTime(parseDateStringToDate(dateString))
@@ -90,7 +116,7 @@ class SessionServiceHelper {
     addDaysToDate(dateString, 1)
   }
 
-  def addBookDates(startDate: String, numberOfDays: Int): Future[ResultSet] = {
+/*  def addBookDates(startDate: String, numberOfDays: Int): Future[ResultSet] = {
     if (numberOfDays > 1) {
       for {
         _ <- appDatabase.sessionDate.book(startDate)
@@ -101,5 +127,5 @@ class SessionServiceHelper {
     else {
       appDatabase.sessionDate.book(startDate)
     }
-  }
+  }*/
 }
