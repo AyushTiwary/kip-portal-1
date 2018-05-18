@@ -7,9 +7,14 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CreateSessionComponent implements OnInit {
 
+  showModal:boolean = true;
   constructor() { }
 
   ngOnInit() {
+  }
+
+  close() {
+    this.showModal = false;
   }
 
 }

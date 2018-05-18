@@ -14,7 +14,7 @@ declare var toastr:any;
 })
 export class LoginComponent implements OnInit {
 
-  user: User = {emailId: 'anubhav.tarar@knoldus.in', password: 'st27k3vuolvluppqm6r9g4ro'};
+  user: User = {emailId: 'anubhav.tarar@knoldus.in', password: 'ddrshrdfe385snf3cqi5p5ho'};
   loginSubscription: Subscription;
   constructor(
     private userService: UserService,

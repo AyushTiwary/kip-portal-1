@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import 'fullcalendar';
 import 'fullcalendar-scheduler';
 import * as $ from 'jquery';
-import {CalendarEvent, Session, UpdateDateRequest} from '../session';
+import {CalendarEvent, CreateSession, Session, UpdateDateRequest} from '../session';
 import {SessionService} from "../session.service";
 import * as moment from 'moment';
 
@@ -15,8 +15,29 @@ export class ListSessionComponent implements OnInit {
 
   listOfSessions: Session[] = [];
   listOfCalendarEvents: CalendarEvent[] = [];
+  showModal:boolean = false;
+  createSession: CreateSession = { startDate: '',
+    trainee: '',
+    technologyName: '',
+    numberOfDays: 0,
+    content: '',
+    assistantTrainer : ''
+  };
 
   constructor(private sessionService: SessionService) {
+  }
+
+  close() {
+    this.showModal = false;
+  }
+
+  create() {
+    const endDate = this.createSession.startDate.split('-');
+     this.createSession.startDate = `${endDate[0]}/${endDate[1]}/${endDate[2]}`;
+    console.log(this.createSession);
+    this.sessionService.createSession(this.createSession).subscribe( res => {
+      console.log(res);
+    })
   }
 
   ngOnInit() {
@@ -69,10 +90,10 @@ export class ListSessionComponent implements OnInit {
     $('#calendar').fullCalendar({
       defaultView: 'month',
       editable: true,
-      dayClick: function () {
-        alert('a day has been clicked!');
+      dayClick: (date, jsEvent, view, resourceObj) => {
+        this.showModal = true;
       },
-      eventDrop: (event, delta, revertFunc) => {
+      eventDrop: (event : any, delta, revertFunc) => {
         this.updateSession(moment(event.start._i).format('YYYY/MM/DD'), moment(event.start._d).format('YYYY/MM/DD'));
       },
       eventSources: [
