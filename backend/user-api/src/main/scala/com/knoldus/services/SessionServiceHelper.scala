@@ -3,6 +3,7 @@ package com.knoldus.services
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
+import com.datastax.driver.core.ResultSet
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
 
@@ -17,23 +18,27 @@ class SessionServiceHelper {
   //Todo(ayush) make nextAvailableDate tail recursive
   def nextAvailableDate(currentDateString: String): String = {
     val nextDate = addDayToDate(currentDateString)
-    if(isDateAvailable(nextDate)) nextDate
+    if (isDateAvailable(nextDate)) nextDate
     else nextAvailableDate(nextDate)
   }
 
   def checkDatesToCreateSession(startDate: String, numberOfDays: Int): Future[Boolean] = {
-    val futureResponses = Future.sequence{
-      createListForDate(startDate, numberOfDays).map{ dateStr =>
-        appDatabase.sessionDate.getOne(dateStr).map{
+    val futureResponses = Future.sequence {
+      createListForDate(startDate, numberOfDays).map { dateStr =>
+        appDatabase.sessionDate.getOne(dateStr).map {
           case Some(_: String) => false
           case None => true
-        }}}
+        }
+      }
+    }
     futureResponses.map(_.forall(res => res))
   }
 
   def createListForDate(startDate: String, numberOfDays: Int): List[String] = {
     startDate :: (1 until numberOfDays).toList.map { day =>
-      addDaysToDate(startDate, day)
+      val dateStr = addDaysToDate(startDate, day)
+      waitToComplete[ResultSet](appDatabase.sessionDate.book(dateStr))
+      dateStr
     }
   }
 
@@ -42,9 +47,9 @@ class SessionServiceHelper {
   }
 
   def isDateAvailable(date: String): Boolean = {
-        if (isHoliday(date) || isWeekend(date)) false
-        else true
-      }
+    if (isHoliday(date) || isWeekend(date)) false
+    else true
+  }
 
   def isWeekend(dateString: String): Boolean = {
     val date = parseDateStringToDate(dateString)
@@ -58,15 +63,15 @@ class SessionServiceHelper {
     getHoliday.contains(dateString)
   }
 
-  def getHoliday: List[String] ={
+  def getHoliday: List[String] = {
     val holidays = List.empty[String]
-    waitToComplete(appDatabase.holiday.getAllDates.map(holidayList => holidays ::: holidayList))
+    waitToComplete[List[String]](appDatabase.holiday.getAllDates.map(holidayList => holidays ::: holidayList))
     holidays
   }
 
   @tailrec
-  private def waitToComplete(res : Future[List[String]]): Boolean ={
-    if(res.isCompleted) true
+  private def waitToComplete[T](res: Future[T]): Boolean = {
+    if (res.isCompleted) true
     else waitToComplete(res)
   }
 
@@ -80,7 +85,7 @@ class SessionServiceHelper {
     formatter.parse(dateString)
   }
 
-  def getNumberOfDaysBetweenDates(startDate: String, endDate: String): Int ={
+  def getNumberOfDaysBetweenDates(startDate: String, endDate: String): Int = {
     (parseDateStringToDate(endDate).getTime - parseDateStringToDate(startDate).getTime) / (1000 * 60 * 60 * 24)
   }.toInt
 
