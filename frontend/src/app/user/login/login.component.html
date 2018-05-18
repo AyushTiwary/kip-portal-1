@@ -1,25 +1,25 @@
-<form class="login100-form validate-form">
+<form class="login100-form validate-form" (ngSubmit)="login()">
 					<span class="login100-form-title p-b-43">
 						Login to continue
 					</span>
 
 
   <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-    <input class="input100" type="text" name="email">
+    <input class="input100" type="text" name="email" [(ngModel)]="user.emailId">
     <span class="focus-input100"></span>
     <span class="label-input100">Email</span>
   </div>
 
 
   <div class="wrap-input100 validate-input" data-validate="Password is required">
-    <input class="input100" type="password" name="pass">
+    <input class="input100" type="password" name="pass" [(ngModel)]="user.password">
     <span class="focus-input100"></span>
     <span class="label-input100">Password</span>
   </div>
 
 
   <div class="container-login100-form-btn">
-    <button class="login100-form-btn">
+    <button class="login100-form-btn" type="submit">
       Login
     </button>
   </div>
@@ -31,7 +31,7 @@
   </div>
 
   <div class="container-login100-form-btn">
-    <a [routerLink]="['/signup']"  class="login100-form-btn">
+    <a [routerLink]="['/user/signup']" class="login100-form-btn">
       Signup
     </a>
   </div>

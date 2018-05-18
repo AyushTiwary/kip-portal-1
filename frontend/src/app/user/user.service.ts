@@ -1,11 +1,42 @@
 import { Injectable } from '@angular/core';
-import {UserModule} from "./user.module";
-import {HttpClient} from "@angular/common/http";
+import {UserModule} from './user.module';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {environment} from '../../environments/environment';
+import {catchError} from 'rxjs/internal/operators';
+import {Observable} from 'rxjs/index';
+import {User} from './user';
 
 @Injectable({
-  providedIn: UserModule
+  providedIn: 'root'
 })
 export class UserService {
 
-  constructor(private http: HttpClient) { }
+  loginURL: string;
+  constructor(private http: HttpClient) {
+    this.loginURL = environment.apiEndPoint + 'kip/login';
+  }
+
+  login(user: User) {
+    return this.http.post(this.loginURL, user)
+      .pipe(catchError(err => this.handleError(err)));
+  }
+
+  signup(emailId: string) {
+    return this.http.post(this.loginURL, {emailId})
+      .pipe(catchError(err => this.handleError(err)));
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<any> {
+    console.log(error);
+    let errMsg: string;
+    if (error.error instanceof ErrorEvent) {
+      errMsg = 'An error occurred:' + error.message;
+    } else {
+      errMsg = `Backend returned code ${error.status}, body was: ${error.error}`;
+    }
+    console.error(errMsg);
+    return Observable.throw(
+      errMsg);
+  }
+
 }

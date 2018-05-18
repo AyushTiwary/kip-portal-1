@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {UserService} from "../user.service";
+import {Observer, Subscription} from "rxjs/index";
 
 @Component({
   selector: 'app-signup',
@@ -6,10 +8,22 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent implements OnInit {
+  emailId: string;
+  signupSubscription: Subscription;
+  constructor(private userService: UserService) { }
 
-  constructor() { }
+  ngOnInit() {}
 
-  ngOnInit() {
+  signup() {
+    this.signupSubscription = this.userService.signup(this.emailId).subscribe((data) => {
+      console.log(data);
+    }, err => {
+      console.error(err);
+    });
   }
+  //
+  // ngOnDestroy() {
+  //   this.signupSubscription.unsubscribe();
+  // }
 
 }
