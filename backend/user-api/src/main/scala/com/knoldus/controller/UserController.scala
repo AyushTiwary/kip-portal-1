@@ -8,7 +8,7 @@ import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import com.knoldus.domains._
+import com.knoldus.domains.{DisplaySchedule, SessionDetails, UserDetails, UserInfo}
 import com.knoldus.exceptions.UserAlreadyExistsException
 import com.knoldus.responses.ErrorResponses._
 import com.knoldus.services.{SessionService, UserService}
@@ -22,7 +22,7 @@ trait UserController extends JsonHelper with LoggerHelper {
   val sessionService = new SessionService
   val logger = getLogger(this.getClass)
 
-  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST
+  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST
 
   def userPOST: Route = {
     cors() {
@@ -124,30 +124,6 @@ trait UserController extends JsonHelper with LoggerHelper {
     sessionService.createSession(data) map { displaySchedule: DisplaySchedule =>
       HttpResponse(OK,
         entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_MSG("Your session successfully scheduled")))
-    }
-  }.recoverWith {
-    case _: Exception => Future.successful(HttpResponse(InternalServerError,
-      entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INTERNAL_SERVER_ERROR)))
-  }
-
-  def updateSessionPOST: Route = {
-    cors() {
-      path("kip" / "updateSession") {
-        post {
-          import com.knoldus.domains.UpdateSessionDetails
-          entity(as[UpdateSessionDetails]) { data =>
-            logger.info("------->" + data)
-            complete(updateSessionRequestHandler(data))
-          }
-        }
-      }
-    }
-  }
-
-  private def updateSessionRequestHandler(data: UpdateSessionDetails): Future[HttpResponse] = {
-    sessionService.updateSession(data) map { displaySchedule: DisplaySchedule =>
-      HttpResponse(OK,
-        entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_MSG("Your session successfully updated")))
     }
   }.recoverWith {
     case _: Exception => Future.successful(HttpResponse(InternalServerError,
