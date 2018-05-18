@@ -9,6 +9,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import com.knoldus.domains._
+import com.knoldus.domains.{UserDetails, UserEmail, UserInfo}
 import com.knoldus.exceptions.UserAlreadyExistsException
 import com.knoldus.responses.ErrorResponses._
 import com.knoldus.services.{SessionService, UserService}
@@ -22,7 +23,7 @@ trait UserController extends JsonHelper with LoggerHelper {
   val sessionService = new SessionService
   val logger = getLogger(this.getClass)
 
-  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST ~ addHolidaysPOST
+  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST ~ addHolidaysPOST ~ getUserPOST
 
   def userPOST: Route = {
     cors() {
@@ -103,6 +104,32 @@ trait UserController extends JsonHelper with LoggerHelper {
             case _: Exception => Future.successful(HttpResponse(InternalServerError,
               entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INTERNAL_SERVER_ERROR)))
           }
+    }
+  }
+  def getUserPOST: Route = {
+    cors() {
+      path("kip" / "user") {
+        post {
+          entity(as[UserEmail]) { data =>
+            complete(handleGetUserRequest(data))
+          }
+        }
+      }
+    }
+  }
+
+  private def handleGetUserRequest(userEmailRegx: UserEmail): Future[HttpResponse] ={
+    userService.getAllusers.map{
+      listOfuserDetails =>
+        val emails =listOfuserDetails
+          .filter(_.emailId.startsWith(userEmailRegx.emailId)).map(_.emailId)
+          HttpResponse(OK,
+            entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_PARSE(emails)))
+    }.recoverWith {
+      case exception: Exception =>
+        logger.error(exception.printStackTrace.toString,exception)
+        Future.successful(HttpResponse(InternalServerError,
+        entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INTERNAL_SERVER_ERROR)))
     }
   }
 

@@ -3,7 +3,7 @@ package com.knoldus.services
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-import com.knoldus.domains.UserDetails
+import com.knoldus.domains.{UserDetails, UserEmail}
 import com.knoldus.util.LoggerHelper
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
@@ -30,5 +30,8 @@ trait UserDbService extends LoggerHelper {
   }.recoverWith{
     case _ => Future.failed(new Exception("unable to get userResponse"))
   }
+  def getAllEmails: Future[List[UserDetails]] ={
+    appDatabase.user.getAllUsers
+  }
 }
-  class UserDbServiceImpl extends UserDbService
+class UserDbServiceImpl extends UserDbService

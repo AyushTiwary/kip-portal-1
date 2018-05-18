@@ -36,12 +36,18 @@ final case class ScheduleInfo(sessionId: String,
 case class SessionInfo(sessionId: String, startDate: String, numberOfDays: Int)
 
 final case class HolidayInfo(date: String, content: String)
+final case class UserEmail(emailId:String)
 
 case object UserInfo extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val userProtocol: RootJsonFormat[UserInfo] = jsonFormat2(UserInfo.apply)
 }
 
 case object UserDetails extends DefaultJsonProtocol with SprayJsonSupport {
+  implicit val userLoginRequestProtocol = jsonFormat3(UserDetails.apply)
+}
+case object UserEmail extends DefaultJsonProtocol with SprayJsonSupport {
+  implicit val userEmailRequestProtocol = jsonFormat1(UserEmail.apply)
+}
   implicit val userLoginRequestProtocol = jsonFormat3(UserDetails.apply)
 }
 

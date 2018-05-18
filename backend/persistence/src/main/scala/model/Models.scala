@@ -39,6 +39,10 @@ abstract class User extends CassandraTable[User, UserDetails] with RootConnector
     case _ => Future.failed(new Exception("unable to update the password"))
   }
 
+  def getAllUsers: Future[List[UserDetails]] ={
+    select.fetch()
+  }
+
   object email extends StringColumn(this) with PartitionKey
 
   object category extends OptionalStringColumn(this)

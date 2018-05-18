@@ -7,7 +7,7 @@ import scala.util.{Failure, Success, Try}
 import akka.actor.{ActorSystem, Props}
 import akka.pattern.ask
 import com.knoldus.actor.DirectNotificationActor
-import com.knoldus.domains.{UserDetails, UserInfo}
+import com.knoldus.domains.{UserDetails, UserEmail, UserInfo}
 import com.knoldus.exceptions.{DbException, UserAlreadyExistsException}
 import com.knoldus.service.MailServiceImpl
 import com.knoldus.util.{LoggerHelper, PassWordUtility, RandomUtil}
@@ -79,6 +79,10 @@ trait UserService extends LoggerHelper {
       .map(user => user
         .filter(password => PassWordUtility.verifyPassword(userLogin.password, password.password))
         .map(userDetail => UserInfo(userDetail.emailId, userDetail.userType)))
+  }
+
+  def getAllusers: Future[List[UserDetails]] ={
+    userDbService.getAllEmails
   }
 }
 
