@@ -14,8 +14,9 @@ class SessionService {
 
   def createSession(sessionDetails: SessionDetails): Future[DisplaySchedule] = {
     val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateStringToDate(sessionDetails.startDate)
-    val numberOfDays = sessionDetails.numberOfDays
     val startDate = sessionHelper.parseDateToDateString(sessionHelper.parseDateStringToDate(sessionDetails.startDate))
+    if(sessionHelper.isDateAvailable(startDate)){
+    val numberOfDays = sessionDetails.numberOfDays
     val calculativeEndDate = sessionHelper.addDaysToDate(startDate, numberOfDays - 1)
     val endDate = if(sessionHelper.isDateAvailable(calculativeEndDate)) calculativeEndDate
     else sessionHelper.nextAvailableDate(calculativeEndDate)
@@ -34,6 +35,9 @@ class SessionService {
         Future.failed(new Exception("dates are not available for creating the session"))
       }
     } yield displaySchedule
+    } else {
+      Future.failed(new Exception(" choose some other starting date"))
+    }
   }
 
   def getAllSession: Future[List[DisplaySchedule]] = {
