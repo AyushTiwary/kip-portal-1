@@ -12,8 +12,11 @@ import {User} from './user';
 export class UserService {
 
   loginURL: string;
+  signupURL: string;
+
   constructor(private http: HttpClient) {
     this.loginURL = environment.apiEndPoint + 'kip/login';
+    this.signupURL = environment.apiEndPoint + 'kip/createuser';
   }
 
   login(user: User) {
@@ -22,7 +25,7 @@ export class UserService {
   }
 
   signup(emailId: string) {
-    return this.http.post(this.loginURL, {emailId})
+    return this.http.post(this.signupURL, {emailId})
       .pipe(catchError(err => this.handleError(err)));
   }
 
