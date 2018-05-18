@@ -40,48 +40,6 @@ final case class ScheduleInfo(sessionId: String,
 
 case class SessionInfo(sessionId: String, startDate: String, numberOfDays: Int)
 
-object DateMarshalling {
-  implicit object DateFormat extends JsonFormat[Date] {
-    def write(date: Date) = JsString(dateToIsoString(date))
-    def read(json: JsValue) = json match {
-      case JsString(rawDate) =>
-        parseIsoDateString(rawDate)
-          .fold(throw new Exception(s"Expected ISO Date format, got $rawDate"))(identity)
-    }
-  }
-
-  private val localIsoDateFormatter = new ThreadLocal[SimpleDateFormat] {
-    override def initialValue() = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  }
-
-  private def dateToIsoString(date: Date) =
-    localIsoDateFormatter.get().format(date)
-
-  private def parseIsoDateString(date: String): Option[Date] =
-    Try{ localIsoDateFormatter.get().parse(date) }.toOption
-}
-
-object DateMarshalling {
-  implicit object DateFormat extends JsonFormat[Date] {
-    def write(date: Date) = JsString(dateToIsoString(date))
-    def read(json: JsValue) = json match {
-      case JsString(rawDate) =>
-        parseIsoDateString(rawDate)
-          .fold(throw new Exception(s"Expected ISO Date format, got $rawDate"))(identity)
-    }
-  }
-
-  private val localIsoDateFormatter = new ThreadLocal[SimpleDateFormat] {
-    override def initialValue() = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-  }
-
-  private def dateToIsoString(date: Date) =
-    localIsoDateFormatter.get().format(date)
-
-  private def parseIsoDateString(date: String): Option[Date] =
-    Try{ localIsoDateFormatter.get().parse(date) }.toOption
-}
-
 case object UserInfo extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val userProtocol: RootJsonFormat[UserInfo] = jsonFormat2(UserInfo.apply)
 }
@@ -96,6 +54,5 @@ case object UpdateSessionDetails extends DefaultJsonProtocol with SprayJsonSuppo
 }
 
 case object SessionDetails extends DefaultJsonProtocol with SprayJsonSupport {
-  import DateMarshalling._
   implicit val sessionDetailsRequestProtocol = jsonFormat6(SessionDetails.apply)
 }
