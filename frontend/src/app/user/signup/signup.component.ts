@@ -7,7 +7,7 @@ import {Observer, Subscription} from "rxjs/index";
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
-export class SignupComponent implements OnInit, OnDestroy {
+export class SignupComponent implements OnInit {
   emailId: string;
   signupSubscription: Subscription;
   constructor(private userService: UserService) { }
@@ -15,19 +15,15 @@ export class SignupComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   signup() {
-    const obs: Observer = {
-      next : (res) => {
-        console.log(res);
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    };
-    this.signupSubscription = this.userService.signup(this.emailId).subscribe(obs);
+    this.signupSubscription = this.userService.signup(this.emailId).subscribe((data) => {
+      console.log(data);
+    }, err => {
+      console.error(err);
+    });
   }
-
-  ngOnDestroy() {
-    this.signupSubscription.unsubscribe();
-  }
+  //
+  // ngOnDestroy() {
+  //   this.signupSubscription.unsubscribe();
+  // }
 
 }

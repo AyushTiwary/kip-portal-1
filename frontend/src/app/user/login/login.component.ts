@@ -8,7 +8,7 @@ import {Observer, Subscription} from 'rxjs/index';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit {
 
   user: User = {emailId: '', password: ''};
   loginSubscription: Subscription;
@@ -17,19 +17,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   login() {
-    const obs: Observer = {
-      next : (res) => {
-        console.log(res);
-      },
-      error: (err) => {
-        console.error(err);
-      }
-    };
-    this.loginSubscription = this.userService.login(this.user).subscribe(obs);
+    this.loginSubscription = this.userService.login(this.user).subscribe((data) => {
+      console.log(data);
+    }, err => {
+      console.error(err);
+    });
   }
 
-  ngOnDestroy() {
-    this.loginSubscription.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   this.loginSubscription.unsubscribe();
+  // }
 
 }
