@@ -7,6 +7,7 @@ import { SignupComponent } from './signup/signup.component';
 import {HttpClientModule} from "@angular/common/http";
 import {FormsModule} from "@angular/forms";
 import { UserComponent } from './user.component';
+import { UpdatePermissionComponent } from './update-permission/update-permission.component';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { UserComponent } from './user.component';
     HttpClientModule,
     FormsModule
   ],
-  declarations: [LoginComponent, SignupComponent, UserComponent],
+  declarations: [LoginComponent, SignupComponent, UserComponent, UpdatePermissionComponent],
 })
 export class UserModule { }
