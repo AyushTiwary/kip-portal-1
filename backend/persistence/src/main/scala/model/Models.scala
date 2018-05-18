@@ -131,6 +131,9 @@ abstract class Holiday extends CassandraTable[Holiday, HolidayDetail] with RootC
   def getHoliday(date: String): Future[Option[HolidayDetail]] =
     select.where(_.date eqs date).one
 
+  def getAllDates: Future[List[String]] =
+    select(_.date).fetch()
+
   def deleteHoliday() = ??? //Todo(ayush)
 
   def updateHoliday() = ??? //Todo(ayush)
@@ -149,9 +152,6 @@ abstract class SessionDate extends CassandraTable[SessionDate, String] with Root
 
   def getAll: Future[List[String]] =
     select.fetch()
-  /*
-    def delete(date: String): Future[ResultSet] =
-      delete.where(_.date eqs date).future()*/
 
   def getOne(date: String): Future[Option[String]] =
     select.where(_.date eqs date).one
