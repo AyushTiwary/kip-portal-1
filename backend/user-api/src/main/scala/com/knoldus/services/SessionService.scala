@@ -19,9 +19,11 @@ class SessionService extends LoggerHelper {
     val numberOfDays = sessionDetails.numberOfDays
     val startDate = sessionHelper.parseDateToDateString(sessionHelper.parseDateStringToDate(sessionDetails.startDate))
     loggerHelper.info("->" + sessionDetails)
-    val endDate = sessionHelper.addDaysToDate(startDate, numberOfDays - 1)
+    val calculativeEndDate = sessionHelper.addDaysToDate(startDate, numberOfDays - 1)
+    val endDate = if (sessionHelper.isDateAvailable(calculativeEndDate)) calculativeEndDate
+    else sessionHelper.nextAvailableDate(calculativeEndDate)
     for {
-      canCreate <- sessionHelper.checkDatesToCreateSession(startDate, numberOfDays)
+      canCreate <- sessionHelper.checkDatesToCreateSession(startDate, sessionHelper.getNumberOfDaysBetweenDates(startDate, endDate))
       displaySchedule <- if (canCreate) {
         for {
           _ <- appDatabase.knolSession.createSession(sessionId, startDate, numberOfDays)
@@ -50,9 +52,16 @@ class SessionService extends LoggerHelper {
 
   //Todo(ayush) verify it using the test case
   def updateSession(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
+    for {
+      _ <- updateAllSession(updateSessionDetails.previousDate, sessionHelper.getNumberOfDaysBetweenDates(updateSessionDetails.previousDate, updateSessionDetails.updateDate))
+      displaySchedule <- update(updateSessionDetails)
+    } yield displaySchedule
+  }
+
+  def update(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
     val updateDate = updateSessionDetails.updateDate
     val previousDate = updateSessionDetails.previousDate
-    val numberOfDays = sessionHelper.getNumberOfDays(previousDate, updateDate)
+    val numberOfDays = sessionHelper.getNumberOfDaysBetweenDates(previousDate, updateDate)
     for {
       maybeSessionInfo <- appDatabase.knolSession.getSessionByDate(previousDate)
       sessionInfo <- maybeSessionInfo.fold[Future[SessionInfo]](Future.failed(new Exception("Unable to get session")))(info => Future.successful(info))
@@ -66,15 +75,26 @@ class SessionService extends LoggerHelper {
     } yield displaySchedule
   }
 
-  private def updateStoreForSession(previousDate: String, updateDate: String): Future[String] = for {
-    mayBeSessionInfo <- appDatabase.knolSession.getSessionByDate(previousDate)
-    sessionInfoForUpdate <- mayBeSessionInfo match {
-      case Some(session) => Future.successful(session)
-      case None => Future.failed(new Exception(s"Session does not exist for date : $previousDate"))
-    }
-    //_ <- appDatabase.schedule.updateScheduleDate(sessionInfoForUpdate.sessionId, updateDate)
-    _ <- appDatabase.knolSession.deleteSession(sessionInfoForUpdate.startDate)
-    // _ <- appDatabase.knolSession.createSession(sessionInfoForUpdate.sessionId, updateDate)
-  } yield sessionInfoForUpdate.startDate
+  private def updateAllSession(previousDate: String, daysCount: Int): Future[List[DisplaySchedule]] = for {
+    sessionInfoList <- appDatabase.knolSession.getAll
+    displayScheduleList <- Future.sequence(sessionInfoList.map { sessionInfo =>
+      if (sessionHelper.parseDateStringToDate(sessionInfo.startDate).after(sessionHelper.parseDateStringToDate(previousDate))) {
+        val preDate = sessionInfo.startDate
+        val calculativeUpdateDate = sessionHelper.addDaysToDate(preDate, daysCount - 1)
+        val updateDate = if (sessionHelper.isDateAvailable(calculativeUpdateDate)) calculativeUpdateDate else sessionHelper.nextAvailableDate(calculativeUpdateDate)
+        update(UpdateSessionDetails(preDate, updateDate))
+      } else {
+        for {
+          mayBeNewScheduleInfo <- appDatabase.schedule.getScheduleBySessionId(sessionInfo.sessionId)
+          newScheduleInfo <- mayBeNewScheduleInfo.fold[Future[ScheduleInfo]](Future.failed(new Exception("Unable to get schedule")))(info => Future.successful(info))
+          preDate = sessionInfo.startDate
+          calculativeUpdateDate = sessionHelper.addDaysToDate(preDate, daysCount - 1)
+          updateDate = if (sessionHelper.isDateAvailable(calculativeUpdateDate)) calculativeUpdateDate else sessionHelper.nextAvailableDate(calculativeUpdateDate)
+          displaySchedule = DisplaySchedule(updateDate, sessionHelper.addDaysToDate(previousDate, sessionInfo.numberOfDays), newScheduleInfo.trainee, newScheduleInfo.technologyName,
+            newScheduleInfo.numberOfDays, newScheduleInfo.content, newScheduleInfo.assistantTrainer)
+        } yield displaySchedule
+      }
+    })
+  } yield displayScheduleList
 
 }

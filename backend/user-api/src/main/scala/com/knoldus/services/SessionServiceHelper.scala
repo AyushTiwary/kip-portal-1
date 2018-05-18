@@ -4,9 +4,9 @@ import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
 import com.typesafe.config.ConfigFactory
-import model.{HolidayDetail, PortalDataBase}
+import model.PortalDataBase
 
-import scala.collection.mutable.ListBuffer
+import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -15,16 +15,10 @@ class SessionServiceHelper {
   val appDatabase = new PortalDataBase(config).getClusterDB
 
   //Todo(ayush) make nextAvailableDate tail recursive
-  def nextAvailableDate(currentDateString: String): Future[String] = {
-    for {
-      isHoliday <- isHoliday(currentDateString)
-      nextAvailableDate <- if (isHoliday || isWeekend(currentDateString)) {
-        nextAvailableDate(addDayToDate(currentDateString))
-      }
-      else {
-        Future.failed(new Exception("date is not available"))
-      }
-    } yield nextAvailableDate
+  def nextAvailableDate(currentDateString: String): String = {
+    val nextDate = addDayToDate(currentDateString)
+    if(isDateAvailable(nextDate)) nextDate
+    else nextAvailableDate(nextDate)
   }
 
   def checkDatesToCreateSession(startDate: String, numberOfDays: Int): Future[Boolean] = {
@@ -47,12 +41,10 @@ class SessionServiceHelper {
     parseDateStringToDate(dateToCheck).after(parseDateStringToDate(preDate))
   }
 
-  def isDateAvailable(date: String): Future[Boolean] =
-    for {
-      isHoliday <- isHoliday(date)
-      isAvailable = if (isHoliday || isWeekend(date)) true
-      else false
-    } yield isAvailable
+  def isDateAvailable(date: String): Boolean = {
+        if (isHoliday(date) || isWeekend(date)) false
+        else true
+      }
 
   def isWeekend(dateString: String): Boolean = {
     val date = parseDateStringToDate(dateString)
@@ -62,11 +54,20 @@ class SessionServiceHelper {
     Calendar.SUNDAY == dayOfWeek || Calendar.SATURDAY == dayOfWeek
   }
 
-  def isHoliday(dateString: String): Future[Boolean] = {
-    appDatabase.holiday.getHoliday(dateString).map {
-      case Some(_: HolidayDetail) => true
-      case None => false
-    }
+  def isHoliday(dateString: String): Boolean = {
+    getHoliday.contains(dateString)
+  }
+
+  def getHoliday: List[String] ={
+    val holidays = List.empty[String]
+    waitToComplete(appDatabase.holiday.getAllDates.map(holidayList => holidays ::: holidayList))
+    holidays
+  }
+
+  @tailrec
+  private def waitToComplete(res : Future[List[String]]): Boolean ={
+    if(res.isCompleted) true
+    else waitToComplete(res)
   }
 
   def parseDateToDateString(date: Date): String = {
@@ -79,31 +80,9 @@ class SessionServiceHelper {
     formatter.parse(dateString)
   }
 
-  def getNumberOfDays(startDate: String, endDate: String): Int ={
+  def getNumberOfDaysBetweenDates(startDate: String, endDate: String): Int ={
     (parseDateStringToDate(endDate).getTime - parseDateStringToDate(startDate).getTime) / (1000 * 60 * 60 * 24)
   }.toInt
-
-/*  def getEndDate(startDate: String, dayCount: Int) ={
-
-  }*/
-
-/*  def findListOfWorkingDays(startDate: String, numberOfDays: Int)={
-    var days = 1
-    var datesStr = ListBuffer(startDate)
-    while(days != numberOfDays){
-      nextAvailableDate(datesStr.last).map{ date =>
-        datesStr.+=:(date)
-      }
-      days = days + 1
-    }
-    datesStr.toList
-  }*/
-
-/*  def addDaysToDate1(str: String, i: Int) ={
-    (0 until(i)).toList.map{ _ =>
-      nextAvailableDate(str)
-    }
-  }*/
 
   def addDaysToDate(dateString: String, numberOfDays: Int): String = {
     val calendar = Calendar.getInstance()
@@ -115,17 +94,4 @@ class SessionServiceHelper {
   def addDayToDate(dateString: String): String = {
     addDaysToDate(dateString, 1)
   }
-
-/*  def addBookDates(startDate: String, numberOfDays: Int): Future[ResultSet] = {
-    if (numberOfDays > 1) {
-      for {
-        _ <- appDatabase.sessionDate.book(startDate)
-        nextAvailableDate <- nextAvailableDate(startDate)
-        res <- addBookDates(nextAvailableDate, numberOfDays - 1)
-      } yield res
-    }
-    else {
-      appDatabase.sessionDate.book(startDate)
-    }
-  }*/
 }
