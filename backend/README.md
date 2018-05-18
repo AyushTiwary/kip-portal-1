@@ -45,6 +45,9 @@ Below steps are required to run user-api module
   Get all sessions
     http://localhost:8080/kip/getallsessions
 
+  route for updating user type
+    http://localhost:8080/kip/changeusertype
+
 
    ```
 ### Sample Json
@@ -83,6 +86,11 @@ Below steps are required to run user-api module
    "date": "2018/03/01",
    "content": "holiday content"
    }
-   
+
+    Json for changing user type
+      {
+            "emailId": "ayush.tiwari@knoldus.in",
+            "userType": "trainer"
+         }
   
    ```

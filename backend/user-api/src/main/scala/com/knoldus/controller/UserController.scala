@@ -23,7 +23,7 @@ trait UserController extends JsonHelper with LoggerHelper {
   val sessionService = new SessionService
   val logger = getLogger(this.getClass)
 
-  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST ~ addHolidaysPOST ~ getUserPOST ~ getAllSessions
+  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST ~ addHolidaysPOST ~ getUserPOST ~ getAllSessions ~ changeUserType
 
   def userPOST: Route = {
     cors() {
@@ -121,8 +121,12 @@ trait UserController extends JsonHelper with LoggerHelper {
   private def handleGetUserRequest(userEmailRegx: UserEmail): Future[HttpResponse] ={
     userService.getAllusers.map{
       listOfuserDetails =>
-        val emails =listOfuserDetails
-          .filter(_.emailId.startsWith(userEmailRegx.emailId)).map(_.emailId)
+        val emails: Seq[UpdateUserRequest] =listOfuserDetails
+          .filter(_.emailId.startsWith(userEmailRegx.emailId)).map(user => UpdateUserRequest(user.emailId,user.userType.fold(throw new Exception("no user type found"))
+          {
+          identity  
+          }
+        ))
           HttpResponse(OK,
             entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_PARSE(emails)))
     }.recoverWith {
@@ -226,6 +230,37 @@ trait UserController extends JsonHelper with LoggerHelper {
       case ex: Exception => Future.successful(HttpResponse(InternalServerError,
         entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, BAD_REQUEST(ex.getMessage))))
     }
+  }
+
+  def changeUserType={
+    cors() {
+      path("kip" / "changeusertype") {
+        post {
+          import com.knoldus.domains.UpdateUserRequest
+          entity(as[UpdateUserRequest]) { data =>
+            logger.info("------->" + data)
+            complete(changeUserTypeHandler(data))
+          }
+        }
+      }
+    }
+  }
+  private def changeUserTypeHandler(userInfo: UpdateUserRequest)= {
+      userService.changeUserType(userInfo.emailId, userInfo.userType).map{
+        _ =>
+          if(userInfo.userType.equalsIgnoreCase("trainee") || userInfo.userType.equalsIgnoreCase("trainer") || userInfo.userType.equalsIgnoreCase("admin") || userInfo.userType.equalsIgnoreCase("root")) {
+            HttpResponse(OK,
+              entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_MSG("User type is updated")))
+          }
+          else{
+            HttpResponse(InternalServerError,
+              entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, BAD_REQUEST("Invalid user type")))
+          }
+      }.recoverWith {
+        case ex: Exception => Future.successful(HttpResponse(InternalServerError,
+          entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, BAD_REQUEST(ex.getMessage))))
+      }
+
   }
 }
 

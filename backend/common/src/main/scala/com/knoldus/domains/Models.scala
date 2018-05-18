@@ -7,6 +7,8 @@ final case class UserInfo(emailId: String, userType: Option[String] = None)
 
 final case class UserDetails(emailId: String, password: String, userType: Option[String] = None)
 
+final case class UpdateUserRequest(emailId: String, userType: String)
+
 final case class SessionDetails(startDate: String,
                                 trainee: String,
                                 technologyName: String,
@@ -63,4 +65,8 @@ case object HolidayInfo extends DefaultJsonProtocol with SprayJsonSupport {
 
 case object DisplaySchedule extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val displayRequestProtocol = jsonFormat7(DisplaySchedule.apply)
+}
+
+case object UpdateUserRequest extends DefaultJsonProtocol with SprayJsonSupport {
+  implicit val updateUserRequestProtocol = jsonFormat2(UpdateUserRequest.apply)
 }

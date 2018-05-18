@@ -84,6 +84,9 @@ trait UserService extends LoggerHelper {
   def getAllusers: Future[List[UserDetails]] ={
     userDbService.getAllEmails
   }
+  def changeUserType(email: String,userType:String)={
+    userDbService.changeUserType(email,userType)
+  }
 }
 
 object UserServiceImpl extends UserService

@@ -2,11 +2,11 @@ package com.knoldus.services
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-
-import com.knoldus.domains.{UserDetails, UserEmail}
+import com.knoldus.domains.{UserDetails, UserEmail, UserInfo}
 import com.knoldus.util.LoggerHelper
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait UserDbService extends LoggerHelper {
@@ -32,6 +32,9 @@ trait UserDbService extends LoggerHelper {
   }
   def getAllEmails: Future[List[UserDetails]] ={
     appDatabase.user.getAllUsers
+  }
+  def changeUserType(email:String,userType:String)={
+    appDatabase.user.updateCategoryByEmail(email,userType)
   }
 }
 class UserDbServiceImpl extends UserDbService
