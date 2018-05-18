@@ -3,6 +3,7 @@ import 'fullcalendar';
 import 'fullcalendar-scheduler';
 import * as $ from 'jquery';
 import {CalendarEvent, Session} from '../session';
+import {SessionService} from "../session.service";
 
 @Component({
   selector: 'app-list-session',
@@ -14,10 +15,13 @@ export class ListSessionComponent implements OnInit {
   listOfSessions: Session[] = [];
   listOfCalendarEvents: CalendarEvent[] = [];
 
-  constructor() {
+  constructor(private sessionService: SessionService) {
   }
 
   ngOnInit() {
+
+    this.getAllSessions();
+
     $('#calendar').fullCalendar({
       defaultView: 'month',
       dayClick: function () {
@@ -25,17 +29,7 @@ export class ListSessionComponent implements OnInit {
       },
       eventSources: [
         {
-          events: [
-            {
-              title: 'event1',
-              start: '2018-06-01'
-            },
-            {
-              title: 'event2',
-              start: '2018-06-05',
-              end: '2018-06-09'
-            }
-          ],
+          events: this.listOfCalendarEvents,
           color: 'black',
           textColor: 'yellow'
         }
@@ -48,10 +42,20 @@ export class ListSessionComponent implements OnInit {
     this.listOfSessions.map(session => {
       this.listOfCalendarEvents.push({
         title: session.technologyName,
-        start: session.startDate.replace('/', '-'),
+        start: session.startDate.replace(/^()/, '-'),
         end: session.endDate.replace('/', '-'),
       });
     });
 
+    console.log(this.listOfCalendarEvents);
+  }
+
+  getAllSessions() {
+    this.sessionService.getAllSessions().subscribe(res => {
+      this.listOfSessions = res.data;
+      this.getCalenderEvents();
+    }, err => {
+      console.error(err);
+    });
   }
 }

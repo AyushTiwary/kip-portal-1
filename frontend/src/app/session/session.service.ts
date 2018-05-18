@@ -12,7 +12,7 @@ export class SessionService {
   getAllSessionsURL: string;
 
   constructor(private http: HttpClient) {
-    this.getAllSessionsURL = environment.apiEndPoint + 'kip/sessions';
+    this.getAllSessionsURL = environment.apiEndPoint + 'kip/getallsessions';
   }
 
   getAllSessions() {
