@@ -65,10 +65,10 @@ Below steps are required to run user-api module
 
    Json for createSchedule
    {
-      "startDate": "2018/05/27",
+      "startDate": "2018/05/16",
       "technologyName": "scala",
       "trainee": "Anubhav",
-      "numberOfDays":5,
+      "numberOfDays":2,
       "content":"Introduction to Scala"
    }
 

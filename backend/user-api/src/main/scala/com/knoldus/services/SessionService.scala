@@ -13,6 +13,17 @@ class SessionService {
   val appDatabase = new PortalDataBase(config).getClusterDB
   val sessionHelper = new SessionServiceHelper
 
+  def getMonthlySessionInfos(month: Int, year: Int): Future[List[SessionInfo]] = for{
+    sessionInfoList <- appDatabase.knolSession.getAll
+    sessionInfo = sessionInfoList.flatMap{sessionInfo =>
+      val dateStr = sessionInfo.startDate
+      val splitDate = dateStr.split("/")
+      val getYear = splitDate(0).toInt
+      val getMonth = splitDate(1).toInt
+      if(getMonth == month && getYear == year) List(sessionInfo)
+      else List.empty[SessionInfo]
+    }} yield sessionInfo
+
   def addHoliday(holidayInfo: HolidayInfo): Future[ResultSet] =
     appDatabase.holiday.createHoliday(holidayInfo.date, holidayInfo.content)
 
@@ -49,7 +60,10 @@ class SessionService {
     appDatabase.schedule.getAll.map { sessionDetailsList =>
       sessionDetailsList.map { sessionDetails =>
         val startDate = sessionDetails.startDate
-        val endDate = sessionHelper.addDaysToDate(startDate, sessionDetails.numberOfDays)
+        val numberOfDays = sessionDetails.numberOfDays
+        val calculativeEndDate = sessionHelper.addDaysToDate(startDate, numberOfDays - 1)
+        val endDate = if (sessionHelper.isDateAvailable(calculativeEndDate)) calculativeEndDate
+        else sessionHelper.nextAvailableDate(calculativeEndDate)
         DisplaySchedule(startDate, endDate, sessionDetails.trainee, sessionDetails.technologyName,
           sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
       }

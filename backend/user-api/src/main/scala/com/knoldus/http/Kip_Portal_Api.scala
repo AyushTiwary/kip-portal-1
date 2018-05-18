@@ -35,6 +35,6 @@ object StartKipServer extends App with UserController with Kip_Portal_Api{
   val userService:UserService = UserServiceImpl
   val port = 8080
 
-  Http().bindAndHandle(userRoutes,"192.168.2.125",port)
+  Http().bindAndHandle(userRoutes,"localhost",port)
   println(s" ********** Kip_Portal_Server is started on port ********** $port")
 }

@@ -25,11 +25,11 @@ class SessionServiceSpec extends TestSuite {
 
   it should "create the session" in {
     database.truncate(100.seconds)
-    val scheduleDetails = SessionDetails("2018/05/16", "trainee", "technologyName", 1, "content", None)
+    val scheduleDetails = SessionDetails("2018/04/23", "trainee", "technologyName", 2, "content", None)
     val futureRes =for{
       res <- sessionService.createSession(scheduleDetails)
     } yield res
-    futureRes.map(displaySchedule => assert(displaySchedule === DisplaySchedule("2018/05/16","2018/05/16","trainee","technologyName",1,"content",None)))
+    futureRes.map(displaySchedule => assert(displaySchedule === DisplaySchedule("2018/04/23","2018/04/24","trainee","technologyName",2,"content",None)))
   }
 
   it should "create & update the session" in {

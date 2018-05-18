@@ -214,12 +214,10 @@ trait UserController extends JsonHelper with LoggerHelper {
     }
   }
 
-
-  private def handleGetAllSessions = {
+  private def handleGetAllSessions: Future[HttpResponse] = {
     {
       sessionService.getAllSession.map {
         displaySchedule =>
-          print("*****************"+displaySchedule)
 
           HttpResponse(OK,
             entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_PARSE(displaySchedule)))

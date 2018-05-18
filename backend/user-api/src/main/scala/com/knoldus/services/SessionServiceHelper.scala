@@ -3,7 +3,6 @@ package com.knoldus.services
 import java.text.SimpleDateFormat
 import java.util.{Calendar, Date}
 
-import com.datastax.driver.core.ResultSet
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
 
