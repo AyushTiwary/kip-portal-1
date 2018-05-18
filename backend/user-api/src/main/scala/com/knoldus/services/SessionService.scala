@@ -2,6 +2,8 @@ package com.knoldus.services
 
 import com.knoldus.domains.{DisplaySchedule, ScheduleInfo, SessionDetails, UpdateSessionDetails, _}
 import com.knoldus.util.LoggerHelper
+import com.datastax.driver.core.ResultSet
+import com.knoldus.domains._
 import com.typesafe.config.ConfigFactory
 import model.PortalDataBase
 
@@ -13,6 +15,9 @@ class SessionService extends LoggerHelper {
   val appDatabase = new PortalDataBase(config).getClusterDB
   val sessionHelper = new SessionServiceHelper
   val loggerHelper = getLogger(this.getClass)
+
+  def addHoliday(holidayInfo: HolidayInfo): Future[ResultSet] =
+    appDatabase.holiday.createHoliday(holidayInfo.date, holidayInfo.content)
 
   def createSession(sessionDetails: SessionDetails): Future[DisplaySchedule] = {
     val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateStringToDate(sessionDetails.startDate)

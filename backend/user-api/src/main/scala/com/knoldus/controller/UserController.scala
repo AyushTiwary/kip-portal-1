@@ -22,7 +22,7 @@ trait UserController extends JsonHelper with LoggerHelper {
   val sessionService = new SessionService
   val logger = getLogger(this.getClass)
 
-  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST
+  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST ~ addHolidaysPOST
 
   def userPOST: Route = {
     cors() {
@@ -153,7 +153,29 @@ trait UserController extends JsonHelper with LoggerHelper {
     case _: Exception => Future.successful(HttpResponse(InternalServerError,
       entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INTERNAL_SERVER_ERROR)))
   }
+  def addHolidaysPOST: Route = {
+    cors() {
+      path("kip" / "addholiday") {
+        post {
+          import com.knoldus.domains.HolidayInfo
+          entity(as[HolidayInfo]) { data =>
+            logger.info("------->" + data)
+            complete(handleAddHolidayRequest(data))
+          }
+        }
+      }
+    }
+  }
 
+  private def handleAddHolidayRequest(holidayInfo: HolidayInfo)= {
+    sessionService.addHoliday(holidayInfo).map{ _ =>
+      HttpResponse(OK,
+        entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_MSG("Your holiday is successful")))
+    }
+  }.recoverWith {
+    case _: Exception => Future.successful(HttpResponse(InternalServerError,
+      entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INTERNAL_SERVER_ERROR)))
+  }
 }
 
 

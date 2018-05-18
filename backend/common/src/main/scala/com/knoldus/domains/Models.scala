@@ -1,12 +1,7 @@
 package com.knoldus.domains
 
-import java.text.SimpleDateFormat
-import java.util.Date
-
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import spray.json.{DefaultJsonProtocol, JsString, JsValue, JsonFormat, RootJsonFormat}
-
-import scala.util.Try
+import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 final case class UserInfo(emailId: String, userType: Option[String] = None)
 
@@ -40,10 +35,11 @@ final case class ScheduleInfo(sessionId: String,
 
 case class SessionInfo(sessionId: String, startDate: String, numberOfDays: Int)
 
+final case class HolidayInfo(date: String, content: String)
+
 case object UserInfo extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val userProtocol: RootJsonFormat[UserInfo] = jsonFormat2(UserInfo.apply)
 }
-
 
 case object UserDetails extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val userLoginRequestProtocol = jsonFormat3(UserDetails.apply)
@@ -55,4 +51,8 @@ case object UpdateSessionDetails extends DefaultJsonProtocol with SprayJsonSuppo
 
 case object SessionDetails extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val sessionDetailsRequestProtocol = jsonFormat6(SessionDetails.apply)
+}
+
+case object HolidayInfo extends DefaultJsonProtocol with SprayJsonSupport {
+  implicit val holidaysRequestProtocol = jsonFormat2(HolidayInfo.apply)
 }
