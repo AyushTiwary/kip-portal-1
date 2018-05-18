@@ -17,30 +17,27 @@ class SessionService extends LoggerHelper {
   def createSession(sessionDetails: SessionDetails): Future[DisplaySchedule] = {
     val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateStringToDate(sessionDetails.startDate)
     val startDate = sessionHelper.parseDateToDateString(sessionHelper.parseDateStringToDate(sessionDetails.startDate))
-<<<<<<< 7679fb909a552827bb9c1e905df854860dd9c40c
     loggerHelper.info("->" + sessionDetails)
-=======
-    if(sessionHelper.isDateAvailable(startDate)){
-    val numberOfDays = sessionDetails.numberOfDays
->>>>>>> resolved weekend bug for create session
-    val calculativeEndDate = sessionHelper.addDaysToDate(startDate, numberOfDays - 1)
-    val endDate = if (sessionHelper.isDateAvailable(calculativeEndDate)) calculativeEndDate
-    else sessionHelper.nextAvailableDate(calculativeEndDate)
-    for {
-      canCreate <- sessionHelper.checkDatesToCreateSession(startDate, sessionHelper.getNumberOfDaysBetweenDates(startDate, endDate))
-      displaySchedule <- if (canCreate) {
-        for {
-          _ <- appDatabase.knolSession.createSession(sessionId, startDate, numberOfDays)
-          scheduleInfo = ScheduleInfo(sessionId, startDate, sessionDetails.trainee, sessionDetails.technologyName,
-            sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
-          _ <- appDatabase.schedule.createSchedule(scheduleInfo)
-          displaySchedule = DisplaySchedule(startDate, endDate, sessionDetails.trainee, sessionDetails.technologyName,
-            sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
-        } yield displaySchedule
-      } else {
-        Future.failed(new Exception("dates are not available for creating the session"))
-      }
-    } yield displaySchedule
+    if (sessionHelper.isDateAvailable(startDate)) {
+      val numberOfDays = sessionDetails.numberOfDays
+      val calculativeEndDate = sessionHelper.addDaysToDate(startDate, numberOfDays - 1)
+      val endDate = if (sessionHelper.isDateAvailable(calculativeEndDate)) calculativeEndDate
+      else sessionHelper.nextAvailableDate(calculativeEndDate)
+      for {
+        canCreate <- sessionHelper.checkDatesToCreateSession(startDate, sessionHelper.getNumberOfDaysBetweenDates(startDate, endDate))
+        displaySchedule <- if (canCreate) {
+          for {
+            _ <- appDatabase.knolSession.createSession(sessionId, startDate, numberOfDays)
+            scheduleInfo = ScheduleInfo(sessionId, startDate, sessionDetails.trainee, sessionDetails.technologyName,
+              sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
+            _ <- appDatabase.schedule.createSchedule(scheduleInfo)
+            displaySchedule = DisplaySchedule(startDate, endDate, sessionDetails.trainee, sessionDetails.technologyName,
+              sessionDetails.numberOfDays, sessionDetails.content, sessionDetails.assistantTrainer)
+          } yield displaySchedule
+        } else {
+          Future.failed(new Exception("dates are not available for creating the session"))
+        }
+      } yield displaySchedule
     } else {
       Future.failed(new Exception(" choose some other starting date"))
     }
