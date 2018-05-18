@@ -1,7 +1,5 @@
 package com.knoldus.services
 
-import com.knoldus.domains.{DisplaySchedule, ScheduleInfo, SessionDetails, UpdateSessionDetails, _}
-import com.knoldus.util.LoggerHelper
 import com.datastax.driver.core.ResultSet
 import com.knoldus.domains._
 import com.typesafe.config.ConfigFactory
@@ -10,11 +8,10 @@ import model.PortalDataBase
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SessionService extends LoggerHelper {
+class SessionService {
   val config = ConfigFactory.load()
   val appDatabase = new PortalDataBase(config).getClusterDB
   val sessionHelper = new SessionServiceHelper
-  val loggerHelper = getLogger(this.getClass)
 
   def addHoliday(holidayInfo: HolidayInfo): Future[ResultSet] =
     appDatabase.holiday.createHoliday(holidayInfo.date, holidayInfo.content)
@@ -22,7 +19,6 @@ class SessionService extends LoggerHelper {
   def createSession(sessionDetails: SessionDetails): Future[DisplaySchedule] = {
     val sessionId = sessionDetails.technologyName + "-" + sessionHelper.parseDateStringToDate(sessionDetails.startDate)
     val startDate = sessionHelper.parseDateToDateString(sessionHelper.parseDateStringToDate(sessionDetails.startDate))
-    loggerHelper.info("->" + sessionDetails)
     if (sessionHelper.isDateAvailable(startDate)) {
       val numberOfDays = sessionDetails.numberOfDays
       val calculativeEndDate = sessionHelper.addDaysToDate(startDate, numberOfDays - 1)
@@ -62,27 +58,40 @@ class SessionService extends LoggerHelper {
 
   //Todo(ayush) verify it using the test case
   def updateSession(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
-    for {
-      _ <- updateAllSession(updateSessionDetails.previousDate, sessionHelper.getNumberOfDaysBetweenDates(updateSessionDetails.previousDate, updateSessionDetails.updateDate))
-      displaySchedule <- update(updateSessionDetails)
-    } yield displaySchedule
+    val updateDate = updateSessionDetails.updateDate
+    val previousDate = updateSessionDetails.previousDate
+    if (sessionHelper.isDateAvailable(updateDate) && sessionHelper.isDateAvailable(previousDate)) {
+      for {
+        _ <- updateAllSession(updateSessionDetails.previousDate, sessionHelper.getNumberOfDaysBetweenDates(updateSessionDetails.previousDate, updateSessionDetails.updateDate))
+        displaySchedule <- update(updateSessionDetails)
+      } yield displaySchedule
+    } else {
+      Future.failed(new Exception("Unable to update session"))
+    }
+  }.recoverWith {
+    case _ => Future.failed(new Exception("Unable to update session"))
   }
 
   def update(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
     val updateDate = updateSessionDetails.updateDate
     val previousDate = updateSessionDetails.previousDate
-    val numberOfDays = sessionHelper.getNumberOfDaysBetweenDates(previousDate, updateDate)
-    for {
-      maybeSessionInfo <- appDatabase.knolSession.getSessionByDate(previousDate)
-      sessionInfo <- maybeSessionInfo.fold[Future[SessionInfo]](Future.failed(new Exception("Unable to get session")))(info => Future.successful(info))
-      _ <- appDatabase.knolSession.deleteSession(previousDate)
-      _ <- appDatabase.knolSession.createSession(sessionInfo.sessionId, updateDate, sessionInfo.numberOfDays)
-      _ <- appDatabase.schedule.updateScheduleDate(sessionInfo.sessionId, updateDate)
-      mayBeNewScheduleInfo <- appDatabase.schedule.getScheduleBySessionId(sessionInfo.sessionId)
-      newScheduleInfo <- mayBeNewScheduleInfo.fold[Future[ScheduleInfo]](Future.failed(new Exception("Unable to get schedule")))(info => Future.successful(info))
-      displaySchedule = DisplaySchedule(updateDate, sessionHelper.addDaysToDate(previousDate, sessionInfo.numberOfDays + numberOfDays), newScheduleInfo.trainee, newScheduleInfo.technologyName,
-        newScheduleInfo.numberOfDays, newScheduleInfo.content, newScheduleInfo.assistantTrainer)
-    } yield displaySchedule
+    if (sessionHelper.isDateAvailable(updateDate) && sessionHelper.isDateAvailable(previousDate)) {
+      val numberOfDays = sessionHelper.getNumberOfDaysBetweenDates(previousDate, updateDate)
+      for {
+        maybeSessionInfo <- appDatabase.knolSession.getSessionByDate(previousDate)
+        sessionInfo <- maybeSessionInfo.fold[Future[SessionInfo]](Future.failed(new Exception("Unable to get session")))(info => Future.successful(info))
+        _ <- appDatabase.knolSession.deleteSession(previousDate)
+        _ <- appDatabase.knolSession.createSession(sessionInfo.sessionId, updateDate, sessionInfo.numberOfDays)
+        _ <- appDatabase.schedule.updateScheduleDate(sessionInfo.sessionId, updateDate)
+        mayBeNewScheduleInfo <- appDatabase.schedule.getScheduleBySessionId(sessionInfo.sessionId)
+        newScheduleInfo <- mayBeNewScheduleInfo.fold[Future[ScheduleInfo]](Future.failed(new Exception("Unable to get schedule")))(info => Future.successful(info))
+        newEndDate = sessionHelper.addDaysToDate(previousDate, numberOfDays + sessionInfo.numberOfDays - 1)
+        displaySchedule = DisplaySchedule(updateDate, if (sessionHelper.isDateAvailable(newEndDate)) newEndDate else sessionHelper.nextAvailableDate(newEndDate),
+          newScheduleInfo.trainee, newScheduleInfo.technologyName, newScheduleInfo.numberOfDays, newScheduleInfo.content, newScheduleInfo.assistantTrainer)
+      } yield displaySchedule
+    } else {
+      Future.failed(new Exception("Unable to update session"))
+    }
   }
 
   private def updateAllSession(previousDate: String, daysCount: Int): Future[List[DisplaySchedule]] = for {
@@ -106,5 +115,4 @@ class SessionService extends LoggerHelper {
       }
     })
   } yield displayScheduleList
-
 }
