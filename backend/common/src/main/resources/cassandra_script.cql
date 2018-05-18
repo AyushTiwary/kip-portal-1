@@ -1,3 +1,4 @@
+Drop keyspace portal;
 CREATE KEYSPACE IF NOT EXISTS portal WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};
  use portal;
  drop table if exists user;
@@ -22,7 +23,7 @@ CREATE TABLE portal.schedule (
    assistanttrainer text,
    content text,
    date text,
-   numberofdays int,
+   numberOfDays int,
    technologyname text,
    trainee text
 );

@@ -29,6 +29,23 @@ Below steps are required to run user-api module
   
   Create user Route
   http://localhost:8080/kip/createuser
+  
+  Create session route
+    http://localhost:8080/kip/createsession
+    
+  Update session route
+   http://localhost:8080/kip/updateSession
+   
+  Add holiday route
+   http://localhost:8080/kip/addholiday
+   
+  Get all emails
+    http://localhost:8080/kip/user
+    
+  Get all sessions
+    http://localhost:8080/kip/getallsessions
+
+
    ```
 ### Sample Json
    ```
@@ -66,4 +83,6 @@ Below steps are required to run user-api module
    "date": "2018/03/01",
    "content": "holiday content"
    }
+   
+  
    ```

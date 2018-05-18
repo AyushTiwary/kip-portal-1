@@ -48,8 +48,6 @@ case object UserDetails extends DefaultJsonProtocol with SprayJsonSupport {
 case object UserEmail extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val userEmailRequestProtocol = jsonFormat1(UserEmail.apply)
 }
-  implicit val userLoginRequestProtocol = jsonFormat3(UserDetails.apply)
-}
 
 case object UpdateSessionDetails extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val updateSessionDetailsRequestProtocol = jsonFormat2(UpdateSessionDetails.apply)
@@ -61,4 +59,8 @@ case object SessionDetails extends DefaultJsonProtocol with SprayJsonSupport {
 
 case object HolidayInfo extends DefaultJsonProtocol with SprayJsonSupport {
   implicit val holidaysRequestProtocol = jsonFormat2(HolidayInfo.apply)
+}
+
+case object DisplaySchedule extends DefaultJsonProtocol with SprayJsonSupport {
+  implicit val displayRequestProtocol = jsonFormat7(DisplaySchedule.apply)
 }

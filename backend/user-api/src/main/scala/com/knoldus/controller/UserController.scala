@@ -23,7 +23,7 @@ trait UserController extends JsonHelper with LoggerHelper {
   val sessionService = new SessionService
   val logger = getLogger(this.getClass)
 
-  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST ~ addHolidaysPOST ~ getUserPOST
+  val userRoutes: Route = userPOST ~ userLoginPOST ~ createSessionPOST ~ updateSessionPOST ~ addHolidaysPOST ~ getUserPOST ~ getAllSessions
 
   def userPOST: Route = {
     cors() {
@@ -202,6 +202,32 @@ trait UserController extends JsonHelper with LoggerHelper {
   }.recoverWith {
     case _: Exception => Future.successful(HttpResponse(InternalServerError,
       entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INTERNAL_SERVER_ERROR)))
+  }
+
+  def getAllSessions: Route = {
+    cors() {
+      path("kip" / "getallsessions") {
+        get {
+          complete(handleGetAllSessions)
+        }
+      }
+    }
+  }
+
+
+  private def handleGetAllSessions = {
+    {
+      sessionService.getAllSession.map {
+        displaySchedule =>
+          print("*****************"+displaySchedule)
+
+          HttpResponse(OK,
+            entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_PARSE(displaySchedule)))
+      }
+    }.recoverWith {
+      case ex: Exception => Future.successful(HttpResponse(InternalServerError,
+        entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, BAD_REQUEST(ex.getMessage))))
+    }
   }
 }
 

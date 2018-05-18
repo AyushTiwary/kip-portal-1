@@ -64,7 +64,7 @@ class SessionServiceHelper {
 
   def getHoliday: List[String] = {
     val holidays = List.empty[String]
-    waitToComplete[List[String]](appDatabase.holiday.getAllDates.map(holidayList => holidays ::: holidayList))
+    //waitToComplete[List[String]](appDatabase.holiday.getAllDates.map(holidayList => holidays ::: holidayList))
     holidays
   }
 
