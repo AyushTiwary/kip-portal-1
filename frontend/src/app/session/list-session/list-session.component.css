@@ -5,3 +5,8 @@
   overflow: hidden;
   padding: 42px 55px 45px 55px;
 }
+
+.fc-event {
+  background-color: #3a87ad !important;
+  border: none;
+}

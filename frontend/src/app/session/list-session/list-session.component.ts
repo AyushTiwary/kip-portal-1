@@ -4,6 +4,7 @@ import 'fullcalendar-scheduler';
 import * as $ from 'jquery';
 import {CalendarEvent, Session, UpdateDateRequest} from '../session';
 import {SessionService} from "../session.service";
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-list-session',
@@ -50,19 +51,18 @@ export class ListSessionComponent implements OnInit {
     });
   }
 
-  updateSession(event: CalendarEvent) {
-    // const request: UpdateDateRequest = {
-    //   previousDate: event.,
-    //   updateDate: ''
-    // };
+  updateSession(prevDate: string, updatedDate: string) {
 
-    // this.sessionService.updateSession().subscribe(res => {
-    //   this.listOfSessions = res.data;
-    //   this.getCalenderEvents();
-    //   this.renderCalendar();
-    // }, err => {
-    //   console.error(err);
-    // });
+    const updateDateRequest: UpdateDateRequest = {
+      previousDate: prevDate,
+      updateDate: updatedDate
+    };
+
+    this.sessionService.updateSession(updateDateRequest).subscribe(res => {
+      this.getAllSessions();
+    }, err => {
+      console.error(err);
+    });
   }
 
   renderCalendar() {
@@ -73,17 +73,12 @@ export class ListSessionComponent implements OnInit {
         alert('a day has been clicked!');
       },
       eventDrop: (event, delta, revertFunc) => {
-        console.log(event)
-        this.updateSession(event);
-      },
-      eventDragStart: (event, delta, revertFunc) => {
-        console.log(event);
-        this.updateSession(event);
+        this.updateSession(moment(event.start._i).format('YYYY/MM/DD'), moment(event.start._d).format('YYYY/MM/DD'));
       },
       eventSources: [
         {
           events: this.listOfCalendarEvents,
-          color: 'black',
+          color: '#3a87ad',
           textColor: 'yellow'
         }
       ]
