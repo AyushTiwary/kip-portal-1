@@ -3,7 +3,7 @@ import 'fullcalendar';
 import 'fullcalendar-scheduler';
 import * as $ from 'jquery';
 import {CalendarEvent, Session, UpdateDateRequest} from '../session';
-import {SessionService} from "../session.service";
+import {SessionService} from '../session.service';
 import * as moment from 'moment';
 
 @Component({
@@ -27,18 +27,15 @@ export class ListSessionComponent implements OnInit {
   getCalenderEvents() {
     const find = '/';
     const regex = new RegExp(find, 'g');
-
+    this.listOfCalendarEvents = [];
     this.listOfSessions.map(session => {
-
-      const endDate = session.endDate.split('/');
-      const finalEndDate = `${endDate[0]}-${endDate[1]}-${(+endDate[2] + 1)}`;
+      // const endDate = moment(session.endDate, 'YYYY/MM/DD').add(1, 'days').format('YYYY-MM-DD');
       this.listOfCalendarEvents.push({
         title: session.technologyName,
         start: session.startDate.replace(regex, '-'),
-        end: finalEndDate
+        end: moment(session.endDate, 'YYYY/MM/DD').add(1, 'days').format('YYYY-MM-DD')
       });
     });
-    console.log(this.listOfCalendarEvents);
   }
 
   getAllSessions() {
@@ -59,9 +56,23 @@ export class ListSessionComponent implements OnInit {
     };
 
     this.sessionService.updateSession(updateDateRequest).subscribe(res => {
-      this.getAllSessions();
+      console.log(res.message);
+      this.sessionService.getAllSessions().subscribe(result => {
+        this.listOfSessions = result.data;
+        this.getCalenderEvents();
+        this.updateCalender();
+      }, (error: any) => {
+        console.error(error);
+      });
     }, err => {
       console.error(err);
+      this.sessionService.getAllSessions().subscribe(result => {
+        this.listOfSessions = result.data;
+        this.getCalenderEvents();
+        this.updateCalender();
+      }, (error: any) => {
+        console.error(error);
+      });
     });
   }
 
@@ -77,7 +88,10 @@ export class ListSessionComponent implements OnInit {
       },
       eventSources: [
         {
-          events: this.listOfCalendarEvents,
+          // events: this.listOfCalendarEvents,
+          events: (start, end, timezone, callback) => {
+            callback(this.listOfCalendarEvents);
+          },
           color: '#3a87ad',
           textColor: 'yellow'
         }
@@ -85,6 +99,9 @@ export class ListSessionComponent implements OnInit {
     });
   }
 
-
+  updateCalender() {
+    $('#calendar').fullCalendar('removeEvents');
+    $('#calendar').fullCalendar( 'addEventSource', {events: this.listOfCalendarEvents} );
+  }
 
 }

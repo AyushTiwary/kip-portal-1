@@ -10,3 +10,7 @@
   background-color: #3a87ad !important;
   border: none;
 }
+
+.fc-license-message {
+  display: none !important;
+}
