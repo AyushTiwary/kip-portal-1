@@ -32,6 +32,10 @@ export class StorageService {
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  removeData(key: string): void {
+    localStorage.removeItem(key);
+  }
+
   getData(): LoginResponse {
     return JSON.parse(localStorage.getItem('user'));
   }
