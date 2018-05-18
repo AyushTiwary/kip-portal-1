@@ -8,18 +8,18 @@ import {LogggedInGuard} from "../user/loggged-in.guard";
 const routes: Routes = [
   {
     path: 'session',
-    component: ListsessionComponent,
-    canActivate: [LogggedInGuard]
+    component: ListsessionComponent/*,
+    canActivate: [LogggedInGuard]*/
   },
   {
     path: 'session/create',
-    component: CreateSessionComponent,
-    canActivate: [LogggedInGuard]
+    component: CreateSessionComponent/*,
+    canActivate: [LogggedInGuard]*/
   },
   {
     path: 'session/update',
-    component: UpdateSessionComponent,
-    canActivate: [LogggedInGuard]
+    component: UpdateSessionComponent/*,
+    canActivate: [LogggedInGuard]*/
   }
 ];
 

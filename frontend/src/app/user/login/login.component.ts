@@ -5,6 +5,8 @@ import {Observer, Subscription} from 'rxjs/index';
 import {StorageService} from "../../storage.service";
 import {Router} from "@angular/router";
 
+declare var toastr:any;
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -17,7 +19,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private userService: UserService,
     private myStorage: StorageService,
-    private router: Router) { }
+    private router: Router) {
+  }
 
   ngOnInit() {}
 
@@ -26,7 +29,7 @@ export class LoginComponent implements OnInit {
       this.myStorage.setData('user', user.data);
       this.router.navigate(['session/create']);
     }, err => {
-      console.error(err);
+      toastr.error('Internal Server Error', 'Sorry!');
     });
   }
 
