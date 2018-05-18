@@ -126,8 +126,8 @@ trait UserController extends JsonHelper with LoggerHelper {
         entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, OK_MSG("Your session successfully scheduled")))
     }
   }.recoverWith {
-    case _: Exception => Future.successful(HttpResponse(InternalServerError,
-      entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, INTERNAL_SERVER_ERROR)))
+    case ex: Exception => Future.successful(HttpResponse(InternalServerError,
+      entity = HttpEntities.create(ContentTypes.APPLICATION_JSON, BAD_REQUEST(ex.getMessage))))
   }
 
   def updateSessionPOST: Route = {
