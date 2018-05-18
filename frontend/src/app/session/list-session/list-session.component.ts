@@ -5,6 +5,7 @@ import * as $ from 'jquery';
 import {CalendarEvent, Session, UpdateDateRequest} from '../session';
 import {SessionService} from '../session.service';
 import * as moment from 'moment';
+import {StorageService} from "../../storage.service";
 
 @Component({
   selector: 'app-list-session',
@@ -16,7 +17,7 @@ export class ListSessionComponent implements OnInit {
   listOfSessions: Session[] = [];
   listOfCalendarEvents: CalendarEvent[] = [];
 
-  constructor(private sessionService: SessionService) {
+  constructor(private sessionService: SessionService, private storageService: StorageService) {
   }
 
   ngOnInit() {
@@ -83,7 +84,7 @@ export class ListSessionComponent implements OnInit {
       dayClick: function () {
         alert('a day has been clicked!');
       },
-      eventDrop: (event, delta, revertFunc) => {
+      eventDrop: (event: any, delta, revertFunc) => {
         this.updateSession(moment(event.start._i).format('YYYY/MM/DD'), moment(event.start._d).format('YYYY/MM/DD'));
       },
       eventSources: [

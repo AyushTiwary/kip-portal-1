@@ -561,8 +561,8 @@ textarea.input100 {
   position: absolute;
   border: 0 solid;
   padding: 10px;
-  width: 80px;
-  height: 40px;
+  width: 235px;
+  height: 110px;
   text-align: left;
   border-radius: 0 30px 30px 0;
   background-color: white ;
@@ -571,6 +571,7 @@ textarea.input100 {
 
 .menu:hover {
   transform: scale(1.2);
+  font-weight: bold;
 }
 
 .menu1 {
@@ -580,7 +581,7 @@ textarea.input100 {
 
 .menu3 {
   left:0;
-  top: 40%;
+  top: 47%;
 }
 
 .menu2 {
@@ -589,4 +590,9 @@ textarea.input100 {
   border-radius: 10% !important;
   text-align: center !important;
 ;
+}
+.menu p {
+  font-size: 23px;
+  padding-top: 5px;
+  padding-left: 25px;
 }

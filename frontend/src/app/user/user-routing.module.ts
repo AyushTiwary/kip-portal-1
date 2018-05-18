@@ -5,6 +5,7 @@ import {SignupComponent} from "./signup/signup.component";
 import {AppComponent} from "../app.component";
 import {UserComponent} from "./user.component";
 import {LoginGuard} from "./login.guard";
+import {UpdatePermissionComponent} from "./update-permission/update-permission.component";
 
 const routes: Routes = [
   {path: '', redirectTo: 'user', pathMatch: 'full'},

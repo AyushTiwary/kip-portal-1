@@ -5,6 +5,7 @@ import {UpdateSessionComponent} from './update-session/update-session.component'
 import {LogggedInGuard} from '../user/loggged-in.guard';
 import {ListSessionComponent} from './list-session/list-session.component';
 import {SessionComponent} from "./session.component";
+import {UpdatePermissionComponent} from "./update-permission/update-permission.component";
 
 const routes: Routes = [
   {
@@ -21,6 +22,10 @@ const routes: Routes = [
       }, {
         path: 'list',
         component: ListSessionComponent
+      },
+      {
+        path: 'update/permission',
+        component: UpdatePermissionComponent
       }]
   }
 ];
