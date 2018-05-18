@@ -30,6 +30,7 @@ class SessionService extends LoggerHelper {
       else sessionHelper.nextAvailableDate(calculativeEndDate)
       for {
         canCreate <- sessionHelper.checkDatesToCreateSession(startDate, sessionHelper.getNumberOfDaysBetweenDates(startDate, endDate))
+        _ <- Future.sequence(sessionHelper.createListForDate(startDate, numberOfDays).map(dateStr => appDatabase.sessionDate.book(dateStr)))
         displaySchedule <- if (canCreate) {
           for {
             _ <- appDatabase.knolSession.createSession(sessionId, startDate, numberOfDays)

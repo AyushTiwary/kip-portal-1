@@ -45,4 +45,25 @@ Below steps are required to run user-api module
      "password": "iql2ihrdouauv4ps9q9t57i2"
    
    }
+
+   Json for createSchedule
+   {
+      "startDate": "2018/05/27",
+      "technologyName": "scala",
+      "trainee": "Anubhav",
+      "numberOfDays":5,
+      "content":"Introduction to Scala"
+   }
+
+   Json for update
+   {
+     "previousDate": "2015/05/26",
+     "updateDate": "2018/05/27"
+   }
+
+   Json for holiday
+   {
+   "date": "2018/03/01",
+   "content": "holiday content"
+   }
    ```

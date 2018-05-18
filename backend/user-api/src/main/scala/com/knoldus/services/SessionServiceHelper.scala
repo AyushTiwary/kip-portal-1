@@ -37,7 +37,6 @@ class SessionServiceHelper {
   def createListForDate(startDate: String, numberOfDays: Int): List[String] = {
     startDate :: (1 until numberOfDays).toList.map { day =>
       val dateStr = addDaysToDate(startDate, day)
-      waitToComplete[ResultSet](appDatabase.sessionDate.book(dateStr))
       dateStr
     }
   }
