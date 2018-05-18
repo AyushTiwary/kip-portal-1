@@ -158,11 +158,6 @@ abstract class Holiday extends CassandraTable[Holiday, HolidayDetail] with RootC
     select(_.date).fetch()
   }
 
-  //def deleteHoliday() = ??? //Todo(ayush)
-
-  //def updateHoliday() = ??? //Todo(ayush)
-
-
   object date extends StringColumn(this) with PartitionKey
 
   object holiday extends StringColumn(this)

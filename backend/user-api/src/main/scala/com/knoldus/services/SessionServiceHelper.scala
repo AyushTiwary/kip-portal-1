@@ -61,13 +61,21 @@ class SessionServiceHelper {
     getHoliday.contains(dateString)
   }
 
+  def isBookDate(dateString: String): Boolean =
+    getBookDates.contains(dateString)
+
   def getHoliday: List[String] = {
     val holidays = List.empty[String]
-    //waitToComplete[List[String]](appDatabase.holiday.getAllDates.map(holidayList => holidays ::: holidayList))
+    waitToComplete[List[String]](appDatabase.holiday.getAllDates.map(holidayList => holidays ::: holidayList))
     holidays
   }
 
-  @tailrec
+  def getBookDates: List[String] = {
+    val bookDates = List.empty[String]
+    waitToComplete[List[String]](appDatabase.sessionDate.getAll.map(holidayList => bookDates ::: holidayList))
+    bookDates
+  }
+
   private def waitToComplete[T](res: Future[T]): Boolean = {
     if (res.isCompleted) true
     else waitToComplete(res)
@@ -84,7 +92,7 @@ class SessionServiceHelper {
   }
 
   def getNumberOfDaysBetweenDates(startDate: String, endDate: String): Int = {
-    (parseDateStringToDate(endDate).getTime - parseDateStringToDate(startDate).getTime) / (1000 * 60 * 60 * 24)
+    (parseDateStringToDate(endDate).getTime - parseDateStringToDate(startDate).getTime) / (1000 * 60 * 60 * 24) + 1
   }.toInt
 
   def addDaysToDate(dateString: String, numberOfDays: Int): String = {

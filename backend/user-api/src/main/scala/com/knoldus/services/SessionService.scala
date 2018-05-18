@@ -13,6 +13,7 @@ class SessionService {
   val appDatabase = new PortalDataBase(config).getClusterDB
   val sessionHelper = new SessionServiceHelper
 
+  //Todo add this for future scope
   def getMonthlySessionInfos(month: Int, year: Int): Future[List[SessionInfo]] = for{
     sessionInfoList <- appDatabase.knolSession.getAll
     sessionInfo = sessionInfoList.flatMap{sessionInfo =>
@@ -74,19 +75,19 @@ class SessionService {
   def updateSession(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
     val updateDate = updateSessionDetails.updateDate
     val previousDate = updateSessionDetails.previousDate
-    if (sessionHelper.isDateAvailable(updateDate) && sessionHelper.isDateAvailable(previousDate)) {
+    if (sessionHelper.isDateAvailable(updateDate)) {
       for {
-        _ <- updateAllSession(updateSessionDetails.previousDate, sessionHelper.getNumberOfDaysBetweenDates(updateSessionDetails.previousDate, updateSessionDetails.updateDate))
-        displaySchedule <- update(updateSessionDetails)
+        _ <- updateAllSession(previousDate, sessionHelper.getNumberOfDaysBetweenDates(previousDate, updateDate))
+        displaySchedule <- sessionUpdate(updateSessionDetails)
       } yield displaySchedule
     } else {
-      Future.failed(new Exception("Unable to update session"))
+      Future.failed(new Exception("Unable to update session on weekend"))
     }
   }.recoverWith {
     case _ => Future.failed(new Exception("Unable to update session"))
   }
 
-  def update(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
+  private def sessionUpdate(updateSessionDetails: UpdateSessionDetails): Future[DisplaySchedule] = {
     val updateDate = updateSessionDetails.updateDate
     val previousDate = updateSessionDetails.previousDate
     if (sessionHelper.isDateAvailable(updateDate) && sessionHelper.isDateAvailable(previousDate)) {
@@ -115,7 +116,7 @@ class SessionService {
         val preDate = sessionInfo.startDate
         val calculativeUpdateDate = sessionHelper.addDaysToDate(preDate, daysCount - 1)
         val updateDate = if (sessionHelper.isDateAvailable(calculativeUpdateDate)) calculativeUpdateDate else sessionHelper.nextAvailableDate(calculativeUpdateDate)
-        update(UpdateSessionDetails(preDate, updateDate))
+        sessionUpdate(UpdateSessionDetails(preDate, updateDate))
       } else {
         for {
           mayBeNewScheduleInfo <- appDatabase.schedule.getScheduleBySessionId(sessionInfo.sessionId)
