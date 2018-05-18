@@ -3,6 +3,7 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {environment} from '../../environments/environment';
 import {catchError} from 'rxjs/internal/operators';
 import {Observable} from 'rxjs/index';
+import {UpdateDateRequest} from "./session";
 
 @Injectable({
   providedIn: 'root'
@@ -10,13 +11,20 @@ import {Observable} from 'rxjs/index';
 export class SessionService {
 
   getAllSessionsURL: string;
+  updateSessionURL: string;
 
   constructor(private http: HttpClient) {
     this.getAllSessionsURL = environment.apiEndPoint + 'kip/getallsessions';
+    this.updateSessionURL = environment.apiEndPoint + 'kip/updateSession';
   }
 
   getAllSessions() {
     return this.http.get(this.getAllSessionsURL)
+      .pipe(catchError(err => this.handleError(err)));
+  }
+
+  updateSession(requestData: UpdateDateRequest) {
+    return this.http.post(this.updateSessionURL, requestData)
       .pipe(catchError(err => this.handleError(err)));
   }
 

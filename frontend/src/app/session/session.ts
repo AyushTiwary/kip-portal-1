@@ -13,3 +13,8 @@ export interface CalendarEvent {
   start: string;
   end: string;
 }
+
+export interface UpdateDateRequest {
+  previousDate: string;
+  updateDate: string;
+}
