@@ -80,7 +80,7 @@ export class ListSessionComponent implements OnInit {
   renderCalendar() {
     $('#calendar').fullCalendar({
       defaultView: 'month',
-      editable: true,
+      editable: this.storageService.isAdmin(),
       dayClick: function () {
         alert('a day has been clicked!');
       },
