@@ -21,7 +21,7 @@
       <span class="close" (click)="close()">&times;</span>
     </div>
     <div class="wrap-contact100">
-      <form class="contact100-form validate-form" (ngSubmit)="create()">
+      <form class="contact100-form validate-form" #listForm="ngForm" (ngSubmit)="create(); listForm.clear();">
 				<span class="contact100-form-title">
 					CREATE SESSION
 				</span>

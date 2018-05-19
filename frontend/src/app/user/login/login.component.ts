@@ -1,9 +1,10 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {User} from '../user';
 import {UserService} from '../user.service';
 import {Observer, Subscription} from 'rxjs/index';
 import {StorageService} from "../../storage.service";
 import {Router} from "@angular/router";
+import * as $ from "jquery";
 
 declare var toastr:any;
 
@@ -12,9 +13,9 @@ declare var toastr:any;
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, AfterViewInit {
 
-  user: User = {emailId: 'anubhav.tarar@knoldus.in', password: 'ddrshrdfe385snf3cqi5p5ho'};
+  user: User = {emailId: '', password: ''};
   loginSubscription: Subscription;
   constructor(
     private userService: UserService,
@@ -24,10 +25,24 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {}
 
+  ngAfterViewInit() {
+  $(".input100").each(function(){
+    $(this).on('blur', function(){
+      let value: any = $(this).val();
+      if(value.trim() != "") {
+        $(this).addClass('has-val');
+      }
+      else {
+        $(this).removeClass('has-val');
+      }
+    })
+  });
+}
+
   login() {
     this.userService.login(this.user).subscribe((user) => {
       this.myStorage.setData('user', user.data);
-      this.router.navigate(['session/create']);
+      this.router.navigate(['session/list']);
     }, err => {
       toastr.error('Internal Server Error', 'Sorry!');
     });

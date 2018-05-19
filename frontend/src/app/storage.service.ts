@@ -43,4 +43,17 @@ export class StorageService {
   isLoggedIn() {
     return localStorage.getItem('user') ? true : false;
   }
+
+  isAdmin() {
+    if (localStorage.getItem('user')) {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user.userType === 'admin') {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
 }

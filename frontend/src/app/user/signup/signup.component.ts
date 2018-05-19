@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit} from '@angular/core';
 import {UserService} from '../user.service';
 import {Observer, Subscription} from 'rxjs/index';
 import {StorageService} from '../../storage.service';
@@ -9,7 +9,7 @@ import {Router} from '@angular/router';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
-export class SignupComponent implements OnInit {
+export class SignupComponent implements OnInit, AfterViewInit {
   emailId: string;
   signupSubscription: Subscription;
   constructor(private userService: UserService,
@@ -17,6 +17,20 @@ export class SignupComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit() {}
+
+  ngAfterViewInit() {
+    $(".input100").each(function(){
+      $(this).on('blur', function(){
+        let value: any = $(this).val();
+        if(value.trim() != "") {
+          $(this).addClass('has-val');
+        }
+        else {
+          $(this).removeClass('has-val');
+        }
+      })
+    });
+  }
 
   signup() {
     this.signupSubscription = this.userService.signup(this.emailId).subscribe((value) => {
