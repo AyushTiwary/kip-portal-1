@@ -1,25 +1,25 @@
-<form class="login100-form validate-form" (ngSubmit)="login()">
+<form class="login100-form validate-form" (ngSubmit)="login()" #loginForm="ngForm">
 					<span class="login100-form-title p-b-43">
 						Login to continue
 					</span>
 
 
   <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
-    <input class="input100" type="text" name="email" [(ngModel)]="user.emailId">
+    <input class="input100" type="text" name="email" [(ngModel)]="user.emailId" required>
     <span class="focus-input100"></span>
     <span class="label-input100">Email</span>
   </div>
 
 
   <div class="wrap-input100 validate-input" data-validate="Password is required">
-    <input class="input100" type="password" name="pass" [(ngModel)]="user.password">
+    <input class="input100" type="password" name="pass" [(ngModel)]="user.password" required>
     <span class="focus-input100"></span>
     <span class="label-input100">Password</span>
   </div>
 
 
   <div class="container-login100-form-btn">
-    <button class="login100-form-btn" type="submit">
+    <button class="login100-form-btn" type="submit" [disabled]="!loginForm.valid">
       Login
     </button>
   </div>
