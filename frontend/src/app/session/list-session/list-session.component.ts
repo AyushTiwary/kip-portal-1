@@ -113,7 +113,7 @@ export class ListSessionComponent implements OnInit {
   renderCalendar() {
     $('#calendar').fullCalendar({
       defaultView: 'month',
-      editable: true,
+      editable: this.storageService.isAdmin(),
       dayClick: (date, jsEvent, view, resourceObj) => {
         this.showModal = true;
       },
