@@ -29,6 +29,26 @@ Below steps are required to run user-api module
   
   Create user Route
   http://localhost:8080/kip/createuser
+  
+  Create session route
+    http://localhost:8080/kip/createsession
+    
+  Update session route
+   http://localhost:8080/kip/updateSession
+   
+  Add holiday route
+   http://localhost:8080/kip/addholiday
+   
+  Get all emails
+    http://localhost:8080/kip/user
+    
+  Get all sessions
+    http://localhost:8080/kip/getallsessions
+
+  route for updating user type
+    http://localhost:8080/kip/changeusertype
+
+
    ```
 ### Sample Json
    ```
@@ -45,4 +65,32 @@ Below steps are required to run user-api module
      "password": "iql2ihrdouauv4ps9q9t57i2"
    
    }
+
+   Json for createSchedule
+   {
+      "startDate": "2018/05/16",
+      "technologyName": "scala",
+      "trainee": "Anubhav",
+      "numberOfDays":2,
+      "content":"Introduction to Scala"
+   }
+
+   Json for update
+   {
+     "previousDate": "2015/05/26",
+     "updateDate": "2018/05/27"
+   }
+
+   Json for holiday
+   {
+   "date": "2018/03/01",
+   "content": "holiday content"
+   }
+
+    Json for changing user type
+      {
+            "emailId": "ayush.tiwari@knoldus.in",
+            "userType": "trainer"
+         }
+  
    ```

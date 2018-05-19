@@ -33,7 +33,7 @@ trait Kip_Portal_Api {
 object StartKipServer extends App with UserController with Kip_Portal_Api{
   implicit val system: ActorSystem = ActorSystem("kip-api-routes")
   val userService:UserService = UserServiceImpl
- val port = 8080
+  val port = 8080
 
   Http().bindAndHandle(userRoutes,"localhost",port)
   println(s" ********** Kip_Portal_Server is started on port ********** $port")

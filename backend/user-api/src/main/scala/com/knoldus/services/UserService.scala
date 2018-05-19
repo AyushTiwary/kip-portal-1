@@ -7,7 +7,7 @@ import scala.util.{Failure, Success, Try}
 import akka.actor.{ActorSystem, Props}
 import akka.pattern.ask
 import com.knoldus.actor.DirectNotificationActor
-import com.knoldus.domains.{UserDetails, UserInfo}
+import com.knoldus.domains.{UserDetails, UserEmail, UserInfo}
 import com.knoldus.exceptions.{DbException, UserAlreadyExistsException}
 import com.knoldus.service.MailServiceImpl
 import com.knoldus.util.{LoggerHelper, PassWordUtility, RandomUtil}
@@ -20,32 +20,29 @@ trait UserService extends LoggerHelper {
   def createUser(userRequest: UserInfo): Future[UserInfo] = {
     val password = RandomUtil.alphanumeric()
     val system = ActorSystem("directNotificationActor")
-    isUserExists(userRequest).map {
-      flag =>
+    isUserExists(userRequest).map { flag =>
         if (!flag) {
           val directNotificationActor = system
             .actorOf(Props(new DirectNotificationActor(new MailServiceImpl)))
-          logger.info(s"Sending Email to ${ userRequest.emailId }}")
+          logger.info(s"Sending Email to ${userRequest.emailId}}")
           import scala.concurrent.duration._
 
           import akka.util.Timeout
           val userType = if (userRequest.userType.isDefined) {
             userRequest.userType
           } else {
-            Some(
-              "Trainee")
+            Some("Trainee")
           }
           implicit val timeout = Timeout(5 seconds)
           val userDetails = UserDetails(userRequest.emailId, password)
           val mailDispatch = Try {
-            directNotificationActor ?
-            userDetails
+            directNotificationActor ? userDetails
           }
           mailDispatch match {
             case Success(_) =>
               logger.info("Email is sent successfully !")
             case Failure(exception) => logger
-              .error(s"Sending email failed ${ exception.getMessage }")
+              .error(s"Sending email failed ${exception.getMessage}")
               throw new Exception(exception.getMessage)
           }
 
@@ -63,7 +60,7 @@ trait UserService extends LoggerHelper {
           }
         }
         else {
-          throw UserAlreadyExistsException("User with this emailid Already exists in database")
+          throw UserAlreadyExistsException("User with this emailId Already exists in database")
         }
     }
   }
@@ -82,6 +79,13 @@ trait UserService extends LoggerHelper {
       .map(user => user
         .filter(password => PassWordUtility.verifyPassword(userLogin.password, password.password))
         .map(userDetail => UserInfo(userDetail.emailId, userDetail.userType)))
+  }
+
+  def getAllusers: Future[List[UserDetails]] ={
+    userDbService.getAllEmails
+  }
+  def changeUserType(email: String,userType:String)={
+    userDbService.changeUserType(email,userType)
   }
 }
 
