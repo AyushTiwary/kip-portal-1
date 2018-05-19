@@ -14,7 +14,7 @@ export class LogggedInGuard implements CanActivate {
     if (this.myStorage.isLoggedIn()) {
       return true;
     } else {
-      this.router.navigate(['session/create']);
+      this.router.navigate(['session/list']);
       return false;
     }
   }

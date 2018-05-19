@@ -27,7 +27,7 @@ export class LoginComponent implements OnInit {
   login() {
     this.userService.login(this.user).subscribe((user) => {
       this.myStorage.setData('user', user.data);
-      this.router.navigate(['session/create']);
+      this.router.navigate(['session/list']);
     }, err => {
       toastr.error('Internal Server Error', 'Sorry!');
     });
