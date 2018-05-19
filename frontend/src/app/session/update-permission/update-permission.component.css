@@ -1,0 +1,28 @@
+.dropdown-custom-menu {
+  font-size: 17px !important;
+  width: 100% !important;
+  display: block !important;
+  z-index: 999;
+}
+
+.dropdown-custom-menu li {
+  background: #d575f9;
+  color: white;
+  margin-left: 5px !important;
+  line-height: 50px !important;
+  cursor: pointer !important;
+}
+
+.dropdown-custom-menu li:hover {
+  color: black;
+  background-color: #45b1e3;
+}
+
+select {
+  border:0px;
+  outline:0px;
+}
+
+button {
+  z-index: 1;
+}

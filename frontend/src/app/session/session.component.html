@@ -1,0 +1,14 @@
+<div class="container-contact100">
+  <div *ngIf="isAdmin" class="menu menu1">
+    <p (click)="goTo('session/update/permission')">Update Permissions</p>
+  </div>
+
+  <div *ngIf="isAdmin" class="menu menu3">
+    <p (click)="goTo('session/list')">KIP Sessions</p>
+  </div>
+
+  <div class="menu menu2">
+    <p (click)="logout()">Logout</p>
+  </div>
+  <router-outlet></router-outlet>
+</div>
