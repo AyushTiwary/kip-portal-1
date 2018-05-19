@@ -9,10 +9,13 @@ import {Router} from "@angular/router";
 })
 export class SessionComponent implements OnInit {
 
+  isAdmin: boolean = false;
+
   constructor(private storageService: StorageService,
               private router: Router) { }
 
   ngOnInit() {
+    this.isAdmin = this.storageService.isAdmin();
   }
 
   logout(){
@@ -20,4 +23,7 @@ export class SessionComponent implements OnInit {
     this.router.navigate(['/user/login']);
   }
 
+  goTo(route: string) {
+    this.router.navigate([route]);
+  }
 }

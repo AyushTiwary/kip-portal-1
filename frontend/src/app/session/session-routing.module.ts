@@ -6,6 +6,7 @@ import {LogggedInGuard} from '../user/loggged-in.guard';
 import {ListSessionComponent} from './list-session/list-session.component';
 import {SessionComponent} from "./session.component";
 import {UpdatePermissionComponent} from "./update-permission/update-permission.component";
+import {AdminGuard} from "../user/admin.guard";
 
 const routes: Routes = [
   {
@@ -25,7 +26,8 @@ const routes: Routes = [
       },
       {
         path: 'update/permission',
-        component: UpdatePermissionComponent
+        component: UpdatePermissionComponent,
+        canActivate: [AdminGuard]
       }]
   }
 ];

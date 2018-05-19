@@ -4,6 +4,7 @@ import {environment} from '../../environments/environment';
 import {catchError} from 'rxjs/internal/operators';
 import {Observable} from 'rxjs/index';
 import {UpdateDateRequest} from "./session";
+import {LoginResponse} from "../user/user";
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +12,15 @@ import {UpdateDateRequest} from "./session";
 export class SessionService {
 
   getAllSessionsURL: string;
+  getUsersURL: string;
   updateSessionURL: string;
+  changetypeURL: string;
 
   constructor(private http: HttpClient) {
     this.getAllSessionsURL = environment.apiEndPoint + 'kip/getallsessions';
     this.updateSessionURL = environment.apiEndPoint + 'kip/updateSession';
+    this.getUsersURL = environment.apiEndPoint + 'kip/user';
+    this.changetypeURL = environment.apiEndPoint + 'kip/changeusertype';
   }
 
   getAllSessions() {
@@ -23,8 +28,18 @@ export class SessionService {
       .pipe(catchError(err => this.handleError(err)));
   }
 
+  getUsers(emailId: string) {
+    return this.http.post(this.getUsersURL, {emailId})
+      .pipe(catchError(err => this.handleError(err)));
+  }
+
   updateSession(requestData: UpdateDateRequest) {
     return this.http.post(this.updateSessionURL, requestData)
+      .pipe(catchError(err => this.handleError(err)));
+  }
+
+  updateType(requestData: LoginResponse) {
+    return this.http.post(this.changetypeURL, requestData)
       .pipe(catchError(err => this.handleError(err)));
   }
 

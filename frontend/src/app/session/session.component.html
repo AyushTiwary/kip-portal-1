@@ -1,6 +1,6 @@
 <div class="container-contact100">
-  <div class="menu menu1">
-    <p>Update Permissions</p>
+  <div *ngIf="isAdmin" class="menu menu1">
+    <p (click)="goTo('session/update/permission')">Update Permissions</p>
   </div>
   <div class="menu menu2">
     <p (click)="logout()">Logout</p>
